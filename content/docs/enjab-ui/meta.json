@@ -1,0 +1,2 @@
+{ "title": "Enjab UI", "icon": "Paintbrush",
+  "pages": ["index", "setup", "foundations", "components", "dashboard-chrome", "branding"] }

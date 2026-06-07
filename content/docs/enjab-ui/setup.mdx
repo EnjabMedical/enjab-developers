@@ -1,0 +1,68 @@
+---
+title: Setup
+description: Install Enjab UI into your project with direct or namespaced setup options.
+icon: Download
+---
+
+Enjab UI is a shadcn/ui registry. Install the theme first (it sets design tokens every component depends on), then add components.
+
+## Installation
+
+Choose one approach:
+
+<Tabs items={['Direct','Namespaced']}>
+<Tab value="Direct">
+No configuration required. Install components directly from the registry:
+
+```bash
+npx shadcn@latest add https://ui.enjab.ae/r/theme.json
+npx shadcn@latest add https://ui.enjab.ae/r/button.json
+```
+
+Replace `button.json` with any component name from the registry.
+
+</Tab>
+<Tab value="Namespaced">
+Add the registry to your `components.json`:
+
+```json title="components.json"
+{
+  "registries": {
+    "@enjab-ui": "https://ui.enjab.ae/r/{name}.json"
+  }
+}
+```
+
+Then install components with the namespace:
+
+```bash
+npx shadcn@latest add @enjab-ui/button
+```
+
+</Tab>
+</Tabs>
+
+<Callout type="warn" title="Install theme first">
+The `theme` component sets Enjab design tokens (colors, spacing, radius, sidebar, charts). Every other component depends on it. Add it before anything else.
+</Callout>
+
+## Fonts
+
+Load these three font families. The theme exposes them as CSS variables that components reference.
+
+| Font | Usage | Source |
+|---|---|---|
+| Inter (Display optical size) | Headings | Google Fonts or `next/font` |
+| Satoshi | Body and UI text | https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap |
+| Fragment Mono | Numbers, IDs, times | Google Fonts |
+
+In your stylesheets or layout, declare these fonts. The theme will reference them via:
+- `--font-heading` (Inter)
+- `--font-sans` (Satoshi)
+- `--font-mono` (Fragment Mono)
+
+Use the corresponding CSS class on text that needs a specific font: `font-heading` for titles, no class for body (Satoshi is default), `font-data` for data/numbers.
+
+## Tech Stack
+
+Next.js (App Router) + Tailwind CSS + shadcn/ui. Charts via Recharts. Icons via Lucide.

@@ -1,14 +1,14 @@
 ---
 title: Get started
-description: How the Enjab tools fit together and the fastest path to a working tool — login plus on-brand UI.
+description: How the Enjab tools fit together and the fastest path to a working tool - login plus on-brand UI.
 icon: Rocket
 ---
 
 An **Enjab tool** is a web app that two Enjab services take care of for you:
 
-- **[Sign in with Enjab](/docs/sign-in-with-enjab)** handles _who the user is_ and
+- **[Sign in with Enjab Auth](/docs/sign-in-with-enjab)** handles _who the user is_ and
   _whether they may use your tool_. You never build a login screen or touch a password.
-- **[Enjab UI](/docs/enjab-ui)** gives you the _look_ — a themed component registry and a
+- **[Enjab UI](/docs/enjab-ui)** gives you the _look_ - a themed component registry and a
   dashboard shell, so every Enjab tool feels like one product.
 
 You build the part in the middle: your tool's actual features. Everything else is
@@ -33,7 +33,7 @@ provided.
 
 An Enjab admin adds your tool in [auth.enjab.ae/admin](https://auth.enjab.ae) and hands
 you a `ENJAB_CLIENT_ID` + `ENJAB_CLIENT_SECRET`. See
-[Sign in with Enjab → register](/docs/sign-in-with-enjab) for the exact steps.
+[Sign in with Enjab Auth → register](/docs/sign-in-with-enjab) for the exact steps.
 </Step>
 
 <Step>
@@ -41,7 +41,7 @@ you a `ENJAB_CLIENT_ID` + `ENJAB_CLIENT_SECRET`. See
 
 Drop in the four reference files (`lib/enjab-auth.ts`, the callback route, the logout
 route, and `proxy.ts`). Set your four environment variables. That is the whole
-integration — copy them from [Sign in with Enjab](/docs/sign-in-with-enjab).
+integration - copy them from [Sign in with Enjab Auth](/docs/sign-in-with-enjab).
 </Step>
 
 <Step>

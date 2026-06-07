@@ -1,0 +1,107 @@
+---
+title: "Dashboard shell"
+description: "Wire the Enjab UI dashboard shell to your signed-in user, complete with sidebar and account menu."
+icon: LayoutDashboard
+---
+
+Install the Enjab dashboard chrome, sidebar, and page header components:
+
+```
+npx shadcn add @enjab-ui/dashboard-shell @enjab-ui/sidebar @enjab-ui/page-header
+```
+
+## AppShell component
+
+Create `components/app-shell.tsx` to wrap your dashboard. This component connects your tool's navigation and icon to the shell. Edit only the NAV array and GLYPH; the rest stays as written.
+
+```tsx title="components/app-shell.tsx"
+"use client";
+
+import { LayoutDashboard, Settings } from "lucide-react"; // your tool's icons
+import { DashboardShell } from "@/components/enjab/dashboard-shell";
+import { Sidebar, type SidebarNavGroup } from "@/components/enjab/sidebar";
+import type { EnjabUser } from "@/lib/enjab-auth";
+
+// Your tool's nav. Edit this; leave the rest.
+const NAV: SidebarNavGroup[] = [
+  { items: [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/settings", label: "Settings", icon: Settings },
+  ]},
+];
+
+// Your tool's glyph. Use the SAME inline SVG you put in app/icon.tsx, so the sidebar
+// mark and the favicon are identical. (Don't use a Lucide React component here if you
+// also use it in app/icon.tsx, mirror the raw <svg> so both match.)
+const GLYPH = (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2}
+       strokeLinecap="round" strokeLinejoin="round">
+    {/* ...your favicon's paths... */}
+  </svg>
+);
+
+export function AppShell({ user, children }: { user: EnjabUser; children: React.ReactNode }) {
+  return (
+    <DashboardShell
+      sidebar={
+        <Sidebar
+          appName="Your Tool"                            // YOUR tool's name (not "Enjab")
+          appIcon={GLYPH}                                // same glyph as your favicon
+          groups={NAV}
+          user={user}                                    // getUser() plugs straight in: real name + email
+          onSignOut={() => { window.location.href = "/api/auth/logout"; }}
+        />
+      }
+    >
+      {children}
+    </DashboardShell>
+  );
+}
+```
+
+The sidebar top shows your tool's mark (its favicon square and name), never the Enjab logo. The Enjab logo appears only in the "an Enjab product" byline at the bottom of the sidebar. Keep `appIcon` identical to your favicon's GLYPH.
+
+## Dashboard layout
+
+Create `app/dashboard/layout.tsx` as a server component that fetches the signed-in user and renders the AppShell. If the user is not signed in, redirect to Enjab's login.
+
+```tsx title="app/dashboard/layout.tsx"
+import { redirect } from "next/navigation";
+import { getUser, loginUrl } from "@/lib/enjab-auth";
+import { AppShell } from "@/components/app-shell";
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const user = await getUser();
+  if (!user) redirect(loginUrl("/dashboard"));
+  return <AppShell user={user}>{children}</AppShell>;
+}
+```
+
+## Page header
+
+Each page inside the dashboard renders its own topbar using the PageHeader component:
+
+```tsx
+import { PageHeader } from "@/components/enjab/page-header";
+
+export default function Page() {
+  return (
+    <>
+      <PageHeader title="Dashboard" subtitle="Overview" />
+      <div className="flex-1 overflow-auto p-6">{/* your content */}</div>
+    </>
+  );
+}
+```
+
+## Sign-out flow
+
+The sidebar footer shows the real signed-in person, and its Sign out button goes to Enjab's confirm page first (so nothing happens on an accidental click), then clears only this tool's session and shows "You're signed out of `<tool>`". The central Enjab session stays, so the user remains signed in to Enjab and other tools and can jump back into this tool without logging in again.
+
+<Cards>
+  <Card
+    title="Dashboard chrome reference"
+    href="/docs/enjab-ui/dashboard-chrome"
+    description="Full API for DashboardShell, Sidebar, and PageHeader components."
+  />
+</Cards>

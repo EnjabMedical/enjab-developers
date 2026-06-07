@@ -1,7 +1,7 @@
 /**
  * "an Enjab product" byline. The Enjab parent logo lives ONLY here (each tool shows
  * its own mark elsewhere). The logo loads from the hosted URL, so no local asset is
- * needed. Fixed size and weight on purpose — do not restyle.
+ * needed. Fixed size and weight on purpose - do not restyle.
  */
 export function EnjabByline({ className }: { className?: string }) {
   return (

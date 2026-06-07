@@ -17,10 +17,10 @@ const fragmentMono = Fragment_Mono({
 export const metadata: Metadata = {
   title: {
     default: 'Enjab Developers',
-    template: '%s — Enjab Developers',
+    template: '%s - Enjab Developers',
   },
   description:
-    'Build with Enjab. Documentation for Enjab tools, written for both humans and coding agents: Sign in with Enjab, the Enjab UI design system, and more.',
+    'Build with Enjab. Documentation for Enjab tools, written for both humans and coding agents: Sign in with Enjab Auth, the Enjab UI design system, and more.',
 };
 
 export default function Layout({ children }: LayoutProps<'/'>) {
@@ -31,7 +31,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen font-sans">
-        {/* Enjab is light mode only by design — no dark palette exists. */}
+        {/* Enjab is light mode only by design - no dark palette exists. */}
         <RootProvider theme={{ enabled: false }}>{children}</RootProvider>
       </body>
     </html>

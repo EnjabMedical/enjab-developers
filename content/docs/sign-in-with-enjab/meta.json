@@ -1,0 +1,2 @@
+{ "title": "Sign in with Enjab Auth", "icon": "KeyRound",
+  "pages": ["index", "register", "flow", "nextjs", "roles", "dashboard", "other-stacks"] }

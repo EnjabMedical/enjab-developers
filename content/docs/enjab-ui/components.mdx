@@ -1,0 +1,95 @@
+---
+title: Components
+description: The Enjab UI component catalog with installation instructions and usage rules.
+icon: Component
+---
+
+## Component Catalog
+
+Install components via the namespace:
+
+```sh
+npx shadcn@latest add @enjab-ui/<name>
+```
+
+Or directly without registry configuration:
+
+```sh
+npx shadcn@latest add https://ui.enjab.ae/r/<name>.json
+```
+
+| Component | Purpose |
+|---|---|
+| **theme** | Enjab design tokens (colors, fonts, radius, sidebar, charts). Install first, it sets tokens every component depends on. |
+| **button** | Pill-shaped button with `navy` variant and `loading` prop that disables and shows a spinner during async actions. |
+| **status-pill** | Colored dot plus label. Status is never color alone. |
+| **alert** | In-page message box in four tones (success, info, warning, danger). Icon and title carry the meaning. Pass `tone`, `title`, and optional body or `action`. |
+| **stat-card** | KPI card with a mono value and trend delta. |
+| **logo** | The Enjab parent logo. Light backgrounds only. Use only in the "an Enjab product" byline, never as a tool's own brand. |
+| **app-mark** | A tool's own brand mark (the gradient favicon square and tool name). Use at the top of the sidebar and on landing navbars. Pass `name` and `glyph` (the same glyph as your favicon). |
+| **reveal** | Framer Motion scroll reveal. Landing pages only. |
+| **enjab-byline** | "an Enjab product" byline. Required on every dashboard. |
+| **sidebar-footer** | Required sidebar bottom. Account block (avatar, email, sign out) plus the Enjab byline. Keeps all dashboards identical. |
+| **favicon** | The Enjab favicon, code-generated (app/icon.tsx and app/apple-icon.tsx). Required in every project. Edit the GLYPH constant to swap the letter or paste an icon's inline SVG, same gradient and shape. |
+| **sidebar** | The dashboard sidebar. The brand header shows the tool's own mark and name (pass `appName` and `appIcon`, the same glyph as your favicon), not the Enjab logo. Grouped nav with active state, account footer, and "an Enjab product" byline. Plugs into Enjab Auth: pass the getUser() result as `user` (name and email) and a sign-out handler. |
+| **dashboard-shell** | The dashboard layout (fixed sidebar and scrollable main column). Compose with sidebar and page-header. |
+| **page-header** | The dashboard topbar (title, subtitle, action slot). Aligns with the sidebar brand header. |
+| **data-table** | The Enjab data table, fully self-styled (bordered card, mono uppercase headers, comfortable rows with soft separators and canvas hover, optional title, empty state). Enforced look, identical everywhere. Pass columns and rows; cells stay flexible. Never hand-roll the table. |
+
+## Feedback: Three Components
+
+Enjab has a specific feedback strategy. Never hand-roll colored message boxes.
+
+- **alert** (`@enjab-ui/alert`): Use for a persistent message tied to the current view (form validation errors, a warning before a destructive action, a success or informational notice that should stay). Pass `tone` (success, info, warning, or danger), a `title`, and optional body or `action`. Icon and title carry meaning. Tone mapping: success = it worked / safe, info = neutral context, warning = caution / needs attention, danger = error / blocked.
+
+- **toast** (via Sonner): Use for transient "it worked / it failed" feedback that fires right after an action and auto-dismisses. Does not block the view.
+
+- **status-pill** (`@enjab-ui/status-pill`): Use for the status of a single row, item, or field. Colored dot plus label. Status is never color alone, always pair with text.
+
+## Loading Actions
+
+Any button that triggers a slow action (network request, server action, async submit) must give feedback: disable the button and show a spinner while it runs.
+
+Use the button's `loading` prop:
+
+```tsx
+<Button loading={busy}>Save</Button>
+```
+
+The button disables and shows a spinner automatically. For a form posting to a server action, drive it with `useFormStatus`:
+
+```tsx
+const { pending } = useFormStatus()
+return <Button loading={pending}>Submit</Button>
+```
+
+This prevents double-clicks and signals to the user that something is happening. Never leave a button clickable and silent during a slow action.
+
+## Installation
+
+Install `theme` first. It sets the Enjab design tokens that every component depends on:
+
+```sh
+npx shadcn@latest add @enjab-ui/theme
+```
+
+Then add other components as needed:
+
+```sh
+npx shadcn@latest add @enjab-ui/button
+npx shadcn@latest add @enjab-ui/data-table
+```
+
+## Dashboard Shell
+
+Build the dashboard chrome from ready components:
+
+```tsx
+<DashboardShell>
+  <Sidebar appName="..." appIcon={...} user={...} onSignOut={...} />
+  <PageHeader title="..." subtitle="..." />
+  {/* content */}
+</DashboardShell>
+```
+
+Never hand-roll the sidebar, topbar, or table. Only the cell content and page content are custom.

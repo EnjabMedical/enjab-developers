@@ -1,0 +1,70 @@
+---
+title: "Register your tool"
+description: "Register your tool with Enjab Auth and configure environment variables for Sign in with Enjab Auth."
+icon: ClipboardCheck
+---
+
+An Enjab admin registers your tool once in Enjab Auth admin, then shares the credentials with your team.
+
+<Steps>
+<Step>
+### Add the tool
+
+Go to https://auth.enjab.ae/admin/apps and select "Add tool".
+
+Enter:
+- **Name**: your tool's display name
+- **Slug**: URL-safe identifier (e.g. `my-tool`)
+- **Domain**: must be on `enjab.ae` (e.g. `my-tool.enjab.ae`)
+
+</Step>
+<Step>
+### Copy credentials
+
+After creation, you will see a one-time display of:
+- `ENJAB_CLIENT_ID` (e.g. `enjci_...`)
+- `ENJAB_CLIENT_SECRET` (e.g. `enjsk_...`)
+
+Copy both immediately. The secret is shown once only.
+
+</Step>
+<Step>
+### Confirm the redirect URI
+
+The default redirect URI is `https://<your-domain>/api/auth/callback`. Edit it if needed on the tool's page in Admin.
+
+The redirect URI must be:
+- HTTPS only
+- On your registered domain
+- Path can be any route your tool owns (default path is `/api/auth/callback`)
+
+Enjab locks the host to your domain and refuses redirects to any other host.
+
+</Step>
+<Step>
+### Create roles (optional)
+
+If your tool has features that not every authorized user should access (e.g. an admin-only settings page), go to https://auth.enjab.ae/admin/roles to:
+- Create roles (e.g. `reception`, `doctor`)
+- Attach this tool to the roles that should reach it
+- Assign those roles to employees
+
+By default, access is binary: if Enjab lets the user in, they can use your tool. Only enable roles if you need to gate features by role inside the tool (see [Roles](/docs/sign-in-with-enjab/roles) for details on how to check roles in code).
+
+</Step>
+</Steps>
+
+## Environment variables
+
+Set these on your server. The client secret is server-only and must never reach the browser.
+
+```
+ENJAB_CLIENT_ID=enjci_...
+ENJAB_CLIENT_SECRET=enjsk_...
+ENJAB_REDIRECT_URI=https://yourtool.enjab.ae/api/auth/callback
+ENJAB_ISSUER=https://auth.enjab.ae
+```
+
+<Callout type="warn" title="Client secret is server-only">
+`ENJAB_CLIENT_SECRET` must never ship to the browser. If it ever reaches client code or is exposed, rotate it immediately from the tool's page in Enjab Auth admin.
+</Callout>

@@ -1,0 +1,118 @@
+---
+title: "Update the auth integration"
+description: "Re-validate an existing auth integration against the current Enjab Auth contract."
+icon: KeyRound
+---
+
+When you update your integration, or Enjab Auth releases a new version, verify your tool against the current contract at https://developers.enjab.ae/llms.txt. This page covers the key points to re-check.
+
+## Re-validate every request
+
+This is critical and often the first thing to get wrong when updating.
+
+<Callout type="warn" title="Cache invalidation leak">
+On each request, call `getUser()` fresh. This must call `/userinfo` with `cache: "no-store"`. Never cache the user object beyond the request, or trust your cookie's claims.
+
+A signed-out user, a disabled user, or a user whose role changed at Enjab will keep working in your tool if you cache them. Enjab cannot touch your cookie. The only way central sign-out, account disable, and role changes reach you is if you call `/userinfo` every request.
+
+Always use the reference implementation exactly as written.
+</Callout>
+
+```ts title="lib/enjab-auth.ts"
+export const getUser = cache(async (): Promise<EnjabUser | null> => {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+  const res = await fetch(ISSUER + "/api/oauth/userinfo", {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  return res.ok ? ((await res.json()) as EnjabUser) : null;
+});
+```
+
+Call `getUser()` on every page or endpoint that needs the user, and check the result:
+
+```ts title="app/dashboard/page.tsx"
+import { redirect } from "next/navigation";
+import { getUser, loginUrl } from "@/lib/enjab-auth";
+
+export default async function Page() {
+  const user = await getUser();
+  if (!user) redirect(loginUrl("/dashboard"));
+  return <p>Hello {user.name}</p>;
+}
+```
+
+## No login UI of your own
+
+Your tool must not have a login button or login page. The moment a signed-out user touches any page, redirect straight to Enjab's `/authorize` endpoint. Enjab handles passwords, two-factor, and the greeting screen.
+
+Use the middleware proxy from the reference to redirect instantly:
+
+```ts title="proxy.ts"
+export function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  if (pathname.startsWith("/api/auth")) return NextResponse.next(); // callback/logout are public
+  if (req.cookies.has("enjab_session")) return NextResponse.next();
+
+  const u = new URL(ISSUER + "/authorize");
+  u.searchParams.set("client_id", process.env.ENJAB_CLIENT_ID!);
+  u.searchParams.set("redirect_uri", process.env.ENJAB_REDIRECT_URI!);
+  u.searchParams.set("response_type", "code");
+  u.searchParams.set("state", pathname);
+  return NextResponse.redirect(u);
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+};
+```
+
+## Sign-out flow
+
+Your tool does not clear the session or call any sign-out method. A "Sign out" button navigates to your `/api/auth/logout` route. Enjab shows a confirmation page first, so an accidental click never logs anyone out. On confirm, Enjab sends the user back to your logout route with `?confirmed=1`, and only then do you clear your tool's session.
+
+```ts title="app/api/auth/logout/route.ts"
+export async function GET(req: NextRequest) {
+  if (req.nextUrl.searchParams.get("confirmed") === "1") {
+    const res = NextResponse.redirect(`${ISSUER}/logged-out?client_id=${process.env.ENJAB_CLIENT_ID}`);
+    res.cookies.delete(SESSION_COOKIE);
+    return res;
+  }
+  return NextResponse.redirect(`${ISSUER}/logout?client_id=${process.env.ENJAB_CLIENT_ID}`);
+}
+```
+
+Wire your sign-out button to `/api/auth/logout`:
+
+```tsx
+<Button onClick={() => { window.location.href = "/api/auth/logout"; }}>
+  Sign out
+</Button>
+```
+
+## Role gating (only if role-aware)
+
+By default, Enjab does not send roles. Access is binary: if Enjab let the user in, they have access. Do not gate by role unless your tool is explicitly marked "role-aware" by an Enjab admin.
+
+If your tool is role-aware, you will receive a `roles` array in the user object. Gate internal features like this:
+
+```ts
+if (!user.roles?.includes("reception") && !user.is_super_admin) {
+  return <p>You don't have access to this section.</p>;
+}
+```
+
+Never invent your own role names or gate on roles if your tool is not role-aware. If roles are absent from the user object, your tool is not role-aware, and you should not branch on them.
+
+## Compare against the reference
+
+Your integration should match the reference implementation in the Enjab Auth guide at https://developers.enjab.ae/llms.txt. In particular:
+
+- `getUser()` calls `/api/oauth/userinfo` with `cache: "no-store"`
+- Your `/api/auth/callback` route exchanges the code and stores the token in an httpOnly cookie
+- Your `/api/auth/logout` route waits for `?confirmed=1` before clearing the session
+- Your middleware redirects signed-out users straight to `/authorize`, no button
+- All environment variables are set: `ENJAB_CLIENT_ID`, `ENJAB_CLIENT_SECRET`, `ENJAB_REDIRECT_URI`, `ENJAB_ISSUER`
+
+If you are not using Next.js, the same principles apply: always call `/userinfo` fresh, never cache the user, redirect unsigned users instantly, and confirm sign-out before clearing the session.

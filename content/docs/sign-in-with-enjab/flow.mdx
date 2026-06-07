@@ -1,0 +1,140 @@
+---
+title: The flow and endpoints
+description: Step through the OAuth 2.0 authorization code flow, then reference the key endpoints and response formats.
+icon: Workflow
+---
+
+## The flow
+
+Follow these 5 steps to complete a sign-in:
+
+<Steps>
+<Step>
+### User hits your tool signed out
+
+A signed-out user visits any page on your tool. Your middleware detects no session cookie and immediately redirects (no login button, no login page) to Enjab Auth.
+</Step>
+
+<Step>
+### Redirect to /authorize
+
+Send the user to:
+```
+https://auth.enjab.ae/authorize?client_id=...&redirect_uri=...&response_type=code&state=<return-path>
+```
+
+All parameters are required:
+- `client_id`: your tool's ID (from Enjab Auth admin)
+- `redirect_uri`: must be registered on your tool's page (default `https://<your-domain>/api/auth/callback`)
+- `response_type=code`
+- `state`: the page the user was trying to reach; Enjab returns it unchanged
+
+Optional: add PKCE `code_challenge` (S256) if your tool supports it.
+</Step>
+
+<Step>
+### Enjab authenticates and authorizes
+
+Enjab asks for a password + two-factor (TOTP) if needed. It checks the user's access: if an admin gave them a role or direct grant for your tool, they pass. If not, Enjab shows "no access" and never returns to your tool.
+
+If authorized, Enjab shows a greeting + consent screen ("Welcome, Sara. You have access to `<tool>`. `<tool>` will receive your name, email, role..."), then a Continue button.
+</Step>
+
+<Step>
+### Enjab redirects back with a code
+
+On continue, Enjab sends the browser back:
+```
+https://<your-redirect-uri>?code=<one-time-code>&state=<return-path>
+```
+
+The code is single-use and valid for minutes.
+</Step>
+
+<Step>
+### Exchange code for access token (server-to-server)
+
+Your server makes a POST request to swap the code for an access token:
+
+```bash title="Example: POST /api/oauth/token"
+curl -X POST https://auth.enjab.ae/api/oauth/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=authorization_code&code=<code>&redirect_uri=<redirect-uri>&client_id=<client-id>&client_secret=<client-secret>"
+```
+
+You get back the user's profile and an access token in one response. Store the token in a secure, httpOnly cookie. The user is now signed in to your tool.
+
+On later requests, fetch the fresh user by calling `/api/oauth/userinfo` with the token (see Endpoints below).
+</Step>
+</Steps>
+
+## Redirect instantly (no login button)
+
+Do NOT build a "Sign in with Enjab Auth" button or any login screen. The moment a signed-out user touches ANY page of your tool, your middleware redirects them straight to `/authorize`. Enjab shows the login and the greeting screen. Your tool never builds a login UI.
+
+<Callout type="warn" title="Middleware check on every request">
+On each request, always call `/api/oauth/userinfo` with the stored access token to get the fresh user. Do NOT cache the user object beyond the request or trust your session cookie's claims. This is the only way central sign-out, account disable, and role changes reach your tool. Enjab cannot modify your cookie, so if you cache the user, a signed-out or disabled person keeps working.
+</Callout>
+
+## Endpoints
+
+### GET /authorize
+
+Starts the OAuth flow. Redirect the user's browser here.
+
+**Query parameters:**
+- `client_id` (required): your tool's ID
+- `redirect_uri` (required): must be registered in Enjab Auth admin
+- `response_type=code` (required)
+- `state` (required): any string (typically the page the user was viewing); returned unchanged
+- `code_challenge` (optional): PKCE code challenge (S256)
+
+**Response:**
+Browser redirect to `redirect_uri?code=<one-time-code>&state=<return-path>`
+
+---
+
+### POST /api/oauth/token
+
+Server-to-server only. Swap the authorization code for an access token and user profile.
+
+**Request body (form-encoded or JSON):**
+- `grant_type=authorization_code` (required)
+- `code` (required): from the /authorize callback
+- `redirect_uri` (required): must match the one sent to /authorize
+- `client_id` (required)
+- `client_secret` (required): server only, never expose to the browser
+- `code_verifier` (optional): PKCE verifier, if you sent a code_challenge
+
+**Response:**
+```json
+{
+  "access_token": "enjat_...",
+  "token_type": "Bearer",
+  "expires_in": 28800,
+  "user": {
+    "sub": "0f3c...",
+    "email": "sara@enjab.ae",
+    "name": "Sara Ahmed",
+    "roles": ["reception"],
+    "is_super_admin": false,
+    "is_active": true
+  }
+}
+```
+
+Note: `roles` and `is_super_admin` are only present if your tool is marked role-aware in Enjab Auth admin.
+
+---
+
+### GET /api/oauth/userinfo
+
+Get the fresh user profile. Call this on every request to detect sign-out, account disable, and role changes.
+
+**Request header:**
+```
+Authorization: Bearer <access_token>
+```
+
+**Response:**
+The fresh `user` object (same shape as the token response above).

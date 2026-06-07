@@ -12,7 +12,7 @@ const cards = [
   {
     href: '/docs/sign-in-with-enjab',
     icon: KeyRound,
-    title: 'Sign in with Enjab',
+    title: 'Sign in with Enjab Auth',
     desc: 'Add Enjab as your identity provider. OAuth2 authorization-code flow, roles, and access control.',
   },
   {
@@ -95,13 +95,13 @@ export default function HomePage() {
           </p>
           <ul className="mt-4 grid gap-2 font-mono text-[13px]">
             <li className="text-fd-muted-foreground">
-              <span className="text-fd-primary">/llms.txt</span> — the full index of pages
+              <span className="text-fd-primary">/llms.txt</span> - the full index of pages
             </li>
             <li className="text-fd-muted-foreground">
-              <span className="text-fd-primary">/llms-full.txt</span> — every page, concatenated
+              <span className="text-fd-primary">/llms-full.txt</span> - every page, concatenated
             </li>
             <li className="text-fd-muted-foreground">
-              <span className="text-fd-primary">/llms.mdx/docs/&lt;path&gt;/content.md</span> — one page, raw
+              <span className="text-fd-primary">/llms.mdx/docs/&lt;path&gt;/content.md</span> - one page, raw
             </li>
           </ul>
         </div>

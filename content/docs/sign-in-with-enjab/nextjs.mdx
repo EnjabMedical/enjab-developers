@@ -1,0 +1,179 @@
+---
+title: "Next.js reference"
+description: "Drop-in Next.js App Router implementation for Sign in with Enjab Auth OAuth flow."
+icon: FileCode
+---
+
+Implement Enjab Auth in a Next.js App Router project using these four files. Each handles part of the OAuth flow: client initialization, the callback, sign-out, and middleware to redirect unsigned users.
+
+## Setup
+
+First, add environment variables to `.env.local`:
+
+```
+ENJAB_CLIENT_ID=enjci_...
+ENJAB_CLIENT_SECRET=enjsk_...
+ENJAB_REDIRECT_URI=https://yourtool.enjab.ae/api/auth/callback
+ENJAB_ISSUER=https://auth.enjab.ae
+```
+
+Then add these four files to your project.
+
+## Core auth helpers
+
+Helpers to fetch the user, generate the login URL, and exchange the auth code for a token.
+
+```ts title="lib/enjab-auth.ts"
+import "server-only";
+import { cookies } from "next/headers";
+import { cache } from "react";
+
+const ISSUER = process.env.ENJAB_ISSUER ?? "https://auth.enjab.ae";
+export const SESSION_COOKIE = "enjab_session";
+
+export type EnjabUser = {
+  sub: string; email: string; name: string;
+  roles?: string[];          // present only if the tool is role-aware
+  is_super_admin?: boolean;  // present only if the tool is role-aware
+  is_active: boolean;
+};
+
+export function loginUrl(returnPath = "/") {
+  const u = new URL(ISSUER + "/authorize");
+  u.searchParams.set("client_id", process.env.ENJAB_CLIENT_ID!);
+  u.searchParams.set("redirect_uri", process.env.ENJAB_REDIRECT_URI!);
+  u.searchParams.set("response_type", "code");
+  u.searchParams.set("state", returnPath);
+  return u.toString();
+}
+
+// Cached per request. Returns null if signed out or the token is no longer valid.
+export const getUser = cache(async (): Promise<EnjabUser | null> => {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+  const res = await fetch(ISSUER + "/api/oauth/userinfo", {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  return res.ok ? ((await res.json()) as EnjabUser) : null;
+});
+
+export async function exchangeCode(code: string): Promise<string | null> {
+  const res = await fetch(ISSUER + "/api/oauth/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: process.env.ENJAB_REDIRECT_URI!,
+      client_id: process.env.ENJAB_CLIENT_ID!,
+      client_secret: process.env.ENJAB_CLIENT_SECRET!,
+    }),
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  return (await res.json()).access_token as string;
+}
+```
+
+## OAuth callback
+
+Handles the redirect from Enjab after sign-in. Exchanges the auth code for a token, stores it in a secure cookie, and returns the user to their requested page.
+
+```ts title="app/api/auth/callback/route.ts"
+import { NextResponse, type NextRequest } from "next/server";
+import { exchangeCode, SESSION_COOKIE } from "@/lib/enjab-auth";
+
+export async function GET(req: NextRequest) {
+  const code = req.nextUrl.searchParams.get("code");
+  const state = req.nextUrl.searchParams.get("state") || "/";
+  if (!code) return NextResponse.redirect(new URL("/", req.url));
+  const token = await exchangeCode(code);
+  if (!token) return NextResponse.redirect(new URL("/", req.url));
+  // Only ever return to a local path.
+  const dest = state.startsWith("/") && !state.startsWith("//") ? state : "/";
+  const res = NextResponse.redirect(new URL(dest, req.url));
+  res.cookies.set(SESSION_COOKIE, token, {
+    httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 60 * 60 * 8,
+  });
+  return res;
+}
+```
+
+## Sign-out
+
+Redirects to Enjab's sign-out confirmation page first, so an accidental click never logs the user out. Only signs out of this tool, not the central Enjab session.
+
+```ts title="app/api/auth/logout/route.ts"
+import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE } from "@/lib/enjab-auth";
+
+const ISSUER = process.env.ENJAB_ISSUER ?? "https://auth.enjab.ae";
+
+// Sign-out ALWAYS goes through Enjab's confirm page first (so a stray/accidental click
+// can't log anyone out), and clears ONLY this tool's session, never the central Enjab
+// session. Flow: the Sign out button navigates here -> we send the user to Enjab's
+// /logout confirm -> on confirm, Enjab sends them back here with ?confirmed=1 -> we
+// clear our cookie and show the "You're signed out of <tool>" page. Do NOT clear the
+// cookie or call any signout before ?confirmed=1, or you'll skip the confirmation.
+export async function GET(req: NextRequest) {
+  if (req.nextUrl.searchParams.get("confirmed") === "1") {
+    const res = NextResponse.redirect(`${ISSUER}/logged-out?client_id=${process.env.ENJAB_CLIENT_ID}`);
+    res.cookies.delete(SESSION_COOKIE);
+    return res;
+  }
+  return NextResponse.redirect(`${ISSUER}/logout?client_id=${process.env.ENJAB_CLIENT_ID}`);
+}
+```
+
+## Middleware
+
+Redirects unsigned users straight to Enjab. No login button, no login page. The moment an unsigned user touches any route, they go to Enjab's login and consent flow.
+
+```ts title="proxy.ts"
+import { NextResponse, type NextRequest } from "next/server";
+
+const ISSUER = process.env.ENJAB_ISSUER ?? "https://auth.enjab.ae";
+
+export function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  if (pathname.startsWith("/api/auth")) return NextResponse.next(); // callback/logout are public
+  if (req.cookies.has("enjab_session")) return NextResponse.next();
+
+  const u = new URL(ISSUER + "/authorize");
+  u.searchParams.set("client_id", process.env.ENJAB_CLIENT_ID!);
+  u.searchParams.set("redirect_uri", process.env.ENJAB_REDIRECT_URI!);
+  u.searchParams.set("response_type", "code");
+  u.searchParams.set("state", pathname);
+  return NextResponse.redirect(u);
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+};
+```
+
+## Using it in a page
+
+Fetch the user with `getUser()`. If it returns null, the token expired between requests, so redirect to login. Gate by role only if your tool is role-aware (an Enjab admin has marked it so).
+
+```ts title="Example page"
+import { redirect } from "next/navigation";
+import { getUser, loginUrl } from "@/lib/enjab-auth";
+
+export default async function Page() {
+  const user = await getUser();
+  if (!user) redirect(loginUrl("/"));           // token expired between requests
+  // Most tools stop here: being signed in IS the authorization. Just use the user.
+  return <p>Hello {user.name} ({user.email})</p>;
+}
+
+// ONLY if your tool is role-aware, gate an internal function like this:
+//   if (!user.roles?.includes("reception") && !user.is_super_admin) {
+//     return <p>You don't have access to this section.</p>;
+//   }
+```
+
+<Callout type="info" title="Always validate on each request">
+Call `getUser()` on every request that needs the user. It fetches fresh from Enjab (cache: "no-store"), so role changes, sign-outs, and account disables take effect right away. Never cache the user object beyond the request or trust your cookie's claims.
+</Callout>

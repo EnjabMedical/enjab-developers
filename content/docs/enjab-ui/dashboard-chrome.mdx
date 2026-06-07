@@ -1,0 +1,159 @@
+---
+title: Dashboard chrome
+description: Assemble the dashboard chrome from Enjab UI components instead of hand-rolling the sidebar, topbar, or table.
+icon: PanelsTopLeft
+---
+
+The dashboard chrome (sidebar, topbar, data table) is built from ready-made Enjab UI components. Never hand-roll these core pieces, reimplementing them causes visual drift across projects. Only the page content is custom.
+
+## Components
+
+Build the entire chrome from these four:
+
+- **@enjab-ui/dashboard-shell**: The dashboard layout. Fixed sidebar on the left, scrollable main column. Compose with sidebar and page-header.
+- **@enjab-ui/sidebar**: The left navigation panel. Shows the tool's own brand (via `appName` + `appIcon`, the same glyph as your favicon), not the Enjab logo. Grouped nav items with active state tracking. Account footer (avatar, email, sign-out) plus the "an Enjab product" byline pinned to the bottom. Plugs into Enjab Auth: pass `user` (name + email from getUser()) and a sign-out handler.
+- **@enjab-ui/page-header**: The topbar. Title, subtitle, and an action slot. Aligns with the sidebar brand header (same height, same bottom border).
+- **@enjab-ui/data-table**: The dashboard table. Fully self-styled (bordered card, mono uppercase headers, comfortable rows, soft separators, canvas hover). Pass columns and rows; cell content stays flexible. Optional title and empty state included.
+
+## Assembly pattern
+
+```tsx title="app/dashboard/layout.tsx"
+import { DashboardShell } from "@enjab-ui/dashboard-shell"
+import { Sidebar } from "@enjab-ui/sidebar"
+import { PageHeader } from "@enjab-ui/page-header"
+
+export default function DashboardLayout({ children }) {
+  const user = await getUser() // Enjab Auth
+
+  return (
+    <DashboardShell>
+      <Sidebar
+        appName="Tool Name"
+        appIcon={<GlyphComponent />}
+        user={user}
+        onSignOut={handleSignOut}
+      >
+        <nav className="space-y-1.5">
+          {/* Your nav items */}
+        </nav>
+      </Sidebar>
+      <main>
+        <PageHeader
+          title="Page Title"
+          subtitle="Optional subtitle"
+          action={<Button>Action</Button>}
+        />
+        {children}
+      </main>
+    </DashboardShell>
+  )
+}
+```
+
+## App mark and favicon
+
+The `appIcon` passed to sidebar must match your favicon. Store the glyph in one component to keep them in sync:
+
+```tsx title="app/components/app-glyph.tsx"
+export function AppGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="w-5 h-5">
+      {/* Your icon SVG markup */}
+    </svg>
+  )
+}
+```
+
+Use it in both the sidebar and favicon:
+
+```tsx title="app/icon.tsx"
+import { AppGlyph } from "./components/app-glyph"
+
+const GLYPH = <AppGlyph />
+// ... icon generation code
+```
+
+The Enjab logo (@enjab-ui/logo) appears in exactly one place: the "an Enjab product" byline at the bottom of the sidebar. Never put it in the navbar or sidebar top.
+
+## Instant navigation
+
+Every route that fetches data must ship a loading.tsx skeleton that mirrors the real page. Navigation must feel instant even while data loads. Never show a blank or frozen screen.
+
+```tsx title="app/dashboard/loading.tsx"
+export default function DashboardLoading() {
+  return (
+    <div className="space-y-5 p-6">
+      <div className="h-10 w-48 animate-pulse bg-muted rounded" />
+      <div className="space-y-3">
+        <div className="h-12 w-full animate-pulse bg-muted rounded" />
+        <div className="h-12 w-full animate-pulse bg-muted rounded" />
+      </div>
+    </div>
+  )
+}
+```
+
+Skeletons use `animate-pulse` on `bg-muted` with the same layout as the real content. No layout shift when the real page loads.
+
+## Data table
+
+Never build your own table. Use @enjab-ui/data-table with columns and rows:
+
+```tsx title="app/dashboard/patients/table.tsx"
+import { DataTable } from "@enjab-ui/data-table"
+
+export function PatientsTable({ patients }) {
+  const columns = [
+    { header: "Name", accessor: "name" },
+    { header: "ID", accessor: "id", className: "font-data" },
+    { header: "Status", accessor: "status" },
+  ]
+
+  return (
+    <DataTable
+      columns={columns}
+      rows={patients}
+      title="Patients"
+    />
+  )
+}
+```
+
+The table handles styling, borders, hover states, and empty states. Cell content is yours to customize, but the outer structure is enforced across all Enjab dashboards.
+
+## Responsive behavior
+
+The chrome is already phone-friendly:
+
+- **Sidebar**: Collapses to a hamburger drawer below `lg` breakpoint.
+- **Dashboard shell**: Stacks on small screens.
+- **Data table**: Scrolls horizontally inside its card, no data lost.
+
+For your own page content, stack grids to one column on small screens (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`), use responsive padding (`p-4 sm:p-6`), and avoid fixed pixel widths that overflow a phone.
+
+## Authentication wiring
+
+The sidebar plugs into Enjab Auth. Pass the getUser() result and a sign-out handler:
+
+<Callout type="info" title="Full auth integration">See [Sign in with Enjab Auth](/docs/sign-in-with-enjab/dashboard) for the complete getUser() setup and session handling.</Callout>
+
+```tsx
+const user = await getUser() // Returns { name, email, id }
+
+<Sidebar
+  user={user}
+  onSignOut={async () => {
+    "use server"
+    await signOut()
+  }}
+/>
+```
+
+## Rules
+
+1. Never hand-roll the sidebar, topbar, or table. Use the components as-is.
+2. The brand header and topbar must align (same height, same bottom border).
+3. Every dashboard shows the "an Enjab product" byline at the bottom of the sidebar (via sidebar-footer, included in the sidebar component).
+4. Navigation items inside each group need spacing between them. Wrap items in `space-y-1` or `space-y-1.5`.
+5. Every data-fetching route ships a loading.tsx skeleton. Never leave the page blank while data loads.
+6. The app's own brand mark (favicon + sidebar header) must be identical. Never let them drift.

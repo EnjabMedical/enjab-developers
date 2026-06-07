@@ -1,0 +1,64 @@
+---
+title: Overview
+description: Enjab UI is the Enjab Medical Centre design system published as a shadcn registry, enabling agent-driven theming across all employee-facing tools.
+icon: Paintbrush
+---
+
+Enjab UI is the design system for Enjab Medical Centre, packaged as a shadcn registry. Hand an agent [the spec file](https://developers.enjab.ae/llms.txt) and it can theme any project to match Enjab with no other input.
+
+## Registry endpoints
+
+- **Base URL:** `https://ui.enjab.ae/r/{name}.json`
+- **Namespace:** `@enjab-ui`
+- **Full index:** `https://ui.enjab.ae/r/registry.json`
+
+These docs are the single source of truth for how to use Enjab UI. To keep an existing project current, see [Update an existing tool](/docs/update-an-existing-tool).
+
+## Quick start
+
+Install the theme first (it sets the design tokens all components depend on):
+
+```bash
+npx shadcn@latest add https://ui.enjab.ae/r/theme.json
+npx shadcn@latest add https://ui.enjab.ae/r/button.json
+```
+
+Or use the namespaced registry. Add this to `components.json`:
+
+```json title="components.json"
+{
+  "registries": {
+    "@enjab-ui": "https://ui.enjab.ae/r/{name}.json"
+  }
+}
+```
+
+Then install via namespace:
+
+```bash
+npx shadcn@latest add @enjab-ui/button
+```
+
+## Audience
+
+Enjab builds employee-facing tools (dashboards, internal consoles, automation), each in its own repository, often by different developers and agents. This registry keeps them visually identical.
+
+## Next steps
+
+<Cards>
+  <Card
+    title="Setup"
+    href="/docs/enjab-ui/setup"
+    description="Install and configure the registry in your project."
+  />
+  <Card
+    title="Components"
+    href="/docs/enjab-ui/components"
+    description="Complete list of available components and usage."
+  />
+  <Card
+    title="Foundations"
+    href="/docs/enjab-ui/foundations"
+    description="Design tokens, typography, spacing, and rules."
+  />
+</Cards>

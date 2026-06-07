@@ -7,7 +7,7 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: <NavMark />,
     },
-    // Enjab is light mode only — no theme toggle.
+    // Enjab is light mode only - no theme toggle.
     themeSwitch: { enabled: false },
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };

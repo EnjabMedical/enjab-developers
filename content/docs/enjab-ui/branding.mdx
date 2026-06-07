@@ -1,0 +1,75 @@
+---
+title: Branding and favicon
+description: Brand rules for Enjab tools, favicon setup via @enjab-ui/favicon, and glyph mirroring.
+icon: Sparkles
+---
+
+## Favicon setup
+
+Every Enjab tool ships the favicon via `@enjab-ui/favicon`. Install it once:
+
+```sh
+npx shadcn@latest add @enjab-ui/favicon
+```
+
+This adds `app/icon.tsx` and `app/apple-icon.tsx` (code-generated PNG icons: the Enjab gradient square plus a glyph). Safari renders these natively, so no separate `.ico` is needed.
+
+### Edit the glyph
+
+Open `app/icon.tsx` and find the `GLYPH` constant at the top. Replace it with a letter or paste an icon's inline SVG:
+
+```tsx title="app/icon.tsx"
+const GLYPH = "E"; // Change to your letter, or paste an icon's raw <svg> markup
+```
+
+<Callout type="info" title="Lucide React components do NOT render">
+Paste the raw `<svg>` markup, not a Lucide React component. The icon generator runs at build time and cannot execute components.
+</Callout>
+
+Do the same in `app/apple-icon.tsx`. Use the same glyph in both files.
+
+### Delete old static icons
+
+If the project had a previous version with `app/icon.svg`, delete it so it doesn't clash with the code-generated icons.
+
+## In-app brand mark
+
+Render the same glyph in your app wherever it shows its own square icon or logo (sign-in panels, header marks, dashboards). Mirror the glyph SVG into one small component so the tab icon and the on-screen mark stay identical.
+
+<Callout type="warn" title="The favicon glyph is canonical">
+The glyph in `app/icon.tsx` is the source of truth. The same image (same gradient square, same glyph) MUST appear on screen wherever the app brands itself. Never let them drift.
+</Callout>
+
+## Sidebar brand and app-mark
+
+Use the `@enjab-ui/app-mark` component in the sidebar and landing navbars. It combines the favicon square and the tool name:
+
+```tsx
+import { AppMark } from '@enjab-ui/app-mark';
+
+<AppMark name="Your Tool" glyph="Y" />
+```
+
+Pass the same `glyph` you set in `app/icon.tsx`.
+
+The sidebar component (`@enjab-ui/sidebar`) accepts `appName` and `appIcon` props. Pass the glyph there too, and it renders the tool's own brand at the top, not the Enjab logo.
+
+## Enjab parent logo
+
+The Enjab logo (`@enjab-ui/logo`) appears in EXACTLY ONE place: the "an Enjab product" byline.
+
+- Sidebar dashboards: use `@enjab-ui/sidebar-footer` (account block plus byline) pinned to the bottom.
+- Dashboards without a sidebar: place `@enjab-ui/enjab-byline` anywhere sensible.
+
+Never put the Enjab logo in the navbar or sidebar top. Never restyle these components (fixed sizes keep all dashboards identical).
+
+## Branding rules summary
+
+| What | Where | Rule |
+|---|---|---|
+| Favicon | `app/icon.tsx` + `app/apple-icon.tsx` | Edit `GLYPH`, same value in both files, code-generated only |
+| In-app mark | Anywhere the app shows its own icon | Mirror the favicon glyph SVG into a component, keep it identical |
+| Sidebar brand | `@enjab-ui/app-mark` in sidebar/navbar | Pass tool name + glyph, never the Enjab logo |
+| Parent logo | `@enjab-ui/enjab-byline` or `@enjab-ui/sidebar-footer` | Required on every dashboard, exactly one place, never restyled |
+
+All Enjab tools use light mode only. Reference theme tokens (`bg-teal`, `text-navy`, `bg-success`) instead of hardcoding colors.

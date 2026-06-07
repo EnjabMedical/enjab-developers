@@ -1,0 +1,56 @@
+---
+title: Roles
+description: Control feature access by role. Most tools need no roles, but role-aware tools can gate internal functions.
+icon: ShieldCheck
+---
+
+## When to use roles
+
+Access is binary. An admin gives a user access to your tool via a role or a direct grant. Enjab enforces that at the door. If the user reaches your tool, they are allowed to use it.
+
+Turn on roles only when your tool has functions that not every authorized user should reach, such as an admin-only settings page inside the tool.
+
+## Enabling roles
+
+An Enjab admin flips your tool to "role-aware" (Admin > Tools > your tool > Role-aware). From then on, the `user` object includes `roles` (global keys like `reception`, `doctor`) and `is_super_admin`.
+
+Without the flag, `roles` and `is_super_admin` are omitted from the user object.
+
+## The user object with roles
+
+When your tool is role-aware, `getUser()` returns:
+
+```json
+{
+  "sub": "0f3c...",
+  "email": "sara@enjab.ae",
+  "name": "Sara Ahmed",
+  "roles": ["reception"],
+  "is_super_admin": false,
+  "is_active": true
+}
+```
+
+Most tools never see these keys and should not branch on them. Only role-aware tools receive them.
+
+## Gating features by role
+
+Use the pattern below inside pages or components:
+
+```ts title="lib/enjab-auth.ts"
+const user = await getUser();
+if (!user) redirect(loginUrl("/"));
+
+// ONLY if your tool is role-aware, gate an internal function like this:
+if (!user.roles?.includes("reception") && !user.is_super_admin) {
+  return <p>You don't have access to this section.</p>;
+}
+```
+
+Check `user.roles?.includes("roleName")` or `user.is_super_admin` to control what the signed-in user can reach.
+
+A super admin has `is_super_admin: true` and access to every tool.
+
+<Callout type="info" title="The no-cache rule">
+Call `getUser()` on every request (use `cache: "no-store"`). Do NOT cache the user object beyond the request. This is the only way central sign-out, account disable, and role changes reach your tool.
+</Callout>

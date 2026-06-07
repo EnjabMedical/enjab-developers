@@ -1,0 +1,123 @@
+---
+title: Foundations
+description: Design rules and foundations for building interfaces with Enjab UI.
+icon: Palette
+---
+
+The rules below define how to build any Enjab interface. Reference them in every project.
+
+## Theme & Colors
+
+Enjab uses a light-only, carefully calibrated color system with semantic meaning.
+
+**Light mode only.** Never add a dark theme or `dark:` variants.
+
+**Primary and depth colors:**
+- Teal (#057C8B) is primary.
+- Navy (#1B3766) is depth.
+
+Always reference design tokens (`bg-teal`, `text-navy`, `bg-success`, `text-muted-foreground`, etc.), never hardcode hex values.
+
+**Status colors mean status, never used alone:**
+- Success #42AF48
+- Warning #E0A100
+- Danger #D64545
+- Info #0099FF
+
+Always pair status colors with text or an icon. Never rely on color alone to communicate meaning.
+
+## Typography
+
+The three-font system:
+
+- **Headings:** Inter Display optical size. Never put a heading in Satoshi.
+- **Body and UI:** Satoshi (400, 500, 700, 900 weights).
+- **Data:** Fragment Mono for numbers, IDs, times, and code. Use the `font-data` class.
+
+CSS variables: `--font-heading` (Inter), `--font-sans` (Satoshi), `--font-mono` (Fragment Mono).
+
+## Spacing
+
+4px scale. Never let two sections, cards, or nav items touch. Default gap between blocks is **20px** (Tailwind `gap-5` or `space-y-5`).
+
+## Feedback & Status
+
+There are three feedback patterns. Never hand-roll a colored box:
+
+<Callout type="info" title="The three feedback components">
+1. **Alerts** (@enjab-ui/alert): persistent messages tied to the current view. Use tones: `success` (it worked, safe), `info` (neutral context), `warning` (caution, needs attention), `danger` (error, blocked). Always keep the icon and a worded title.
+
+2. **Toasts** (sonner): transient "it worked" / "it failed" feedback right after an action.
+
+3. **Status pills** (@enjab-ui/status-pill): the status of a single row or item. A colored dot plus label.
+</Callout>
+
+## Buttons & Loading States
+
+Buttons that trigger a slow action (network request, server action, async submit) must give feedback: disable the button and show a spinner while it runs. Use the button's `loading` prop:
+
+```tsx
+<Button loading={busy}>Save</Button>
+```
+
+For a form posting to a server action, drive it with `useFormStatus()`:
+
+```tsx
+const { pending } = useFormStatus();
+<Button loading={pending}>Submit</Button>
+```
+
+Never leave a button clickable and silent during a slow action.
+
+## Motion & Animation
+
+Animations belong on landing and marketing pages only, implemented with Framer Motion. Dashboards and internal tools stay still (instant color and state changes only) for usability.
+
+## Responsive Design
+
+<Callout type="warn" title="Different rules for landing vs. dashboard">
+**Landing / marketing pages:** fully responsive, mobile-first, look right down to 360px.
+
+**Dashboards and internal tools:** desktop-optimized but must stay phone-usable, never desktop-only or broken. The shared chrome already handles most of it: `@enjab-ui/sidebar` collapses to a hamburger drawer below `lg`, `@enjab-ui/dashboard-shell` stacks, and `@enjab-ui/data-table` scrolls horizontally inside its card.
+</Callout>
+
+For your own content on dashboards: stack grids to one column on small screens (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`), shrink page padding (`p-4 sm:p-6`), never set fixed pixel widths that overflow a phone, keep tap targets comfortable. Do NOT build a separate mobile design, just don't break.
+
+## Logo & Branding
+
+- **Enjab logo** (@enjab-ui/logo): light backgrounds only. No reversed or white logo exists.
+- **Tool brand mark** (@enjab-ui/app-mark): a tool's own square icon/logo. Use at the top of the sidebar and on landing navbars. Pass the same glyph as your favicon.
+- **Favicon** (@enjab-ui/favicon): code-generated PNG icons via `app/icon.tsx` + `app/apple-icon.tsx`. The Enjab gradient square plus a glyph (default letter "E"). Edit the GLYPH constant to brand a tool with a different letter or an icon's inline SVG. Delete any old static `app/icon.svg` so it does not clash.
+- **Favicon and in-app mark must be identical.** The favicon glyph is canonical. Wherever the app shows its own square icon/logo, render the same mark, same gradient square, same glyph. Mirror the glyph SVG into one small component so they can never drift.
+
+The Enjab parent logo appears in exactly one place: the "an Enjab product" byline. Never put it in the navbar or sidebar top.
+
+## Navigation & Instant Loading
+
+Navigation must be instant. Every data-fetching route ships a Next.js `loading.tsx` skeleton that mirrors the page and shows immediately while data loads. Never a blank or frozen screen. Skeletons use `animate-pulse` on `bg-muted`, sized to match the real content with no layout shift.
+
+## App Shell & Layout
+
+Build the dashboard chrome from ready components, never hand-roll the sidebar, topbar, or table:
+
+- `@enjab-ui/dashboard-shell`: the dashboard layout (fixed sidebar + scrollable main column).
+- `@enjab-ui/sidebar`: the dashboard sidebar (grouped nav with active state, account footer, byline).
+- `@enjab-ui/page-header`: the dashboard topbar (title, subtitle, action slot).
+- `@enjab-ui/data-table`: fully self-styled data table (bordered card, mono uppercase headers, comfortable rows).
+
+The sidebar brand header and topbar share the same height (`h-15`) and bottom border, so the top reads as one connected bar. The sidebar-footer (account block + byline) pins to the very bottom.
+
+Every dashboard shows the "an Enjab product" byline: sidebar dashboards use `@enjab-ui/sidebar-footer` pinned to the bottom; no-sidebar dashboards place `@enjab-ui/enjab-byline` anywhere sensible. Never restyle these, fixed sizes keep all dashboards identical.
+
+## Language & Direction
+
+English, left to right.
+
+## Tech Stack
+
+- Next.js (App Router)
+- Tailwind CSS
+- shadcn/ui
+- Charts: Recharts
+- Icons: Lucide
+- Motion: Framer Motion (landing only)

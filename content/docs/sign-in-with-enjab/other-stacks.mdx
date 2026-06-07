@@ -1,0 +1,73 @@
+---
+title: "Other stacks and security"
+description: "Implement Enjab Auth without a framework and follow critical security rules."
+icon: Lock
+---
+
+## Other stacks (no framework)
+
+Implement the same three OAuth calls with any stack:
+
+1. **Redirect to /authorize**
+   Construct and redirect to `https://auth.enjab.ae/authorize` with these query parameters:
+   - `client_id` (from your environment)
+   - `redirect_uri` (must match your registered callback URL)
+   - `response_type=code`
+   - `state` (round-trip this back; typically the path to return to after login)
+
+2. **Server-side POST /api/oauth/token**
+   From your backend, call `https://auth.enjab.ae/api/oauth/token` with:
+   - Method: `POST`
+   - Body (form-encoded or JSON):
+     - `grant_type=authorization_code`
+     - `code` (from the redirect callback)
+     - `redirect_uri` (must match the one used in step 1)
+     - `client_id`
+     - `client_secret` (server only, never expose to the browser)
+
+   Response:
+   ```json
+   {
+     "access_token": "enjat_...",
+     "token_type": "Bearer",
+     "expires_in": 28800,
+     "user": {
+       "sub": "0f3c...",
+       "email": "sara@enjab.ae",
+       "name": "Sara Ahmed",
+       "roles": ["reception"],
+       "is_super_admin": false,
+       "is_active": true
+     }
+   }
+   ```
+
+3. **GET /api/oauth/userinfo (fresh roles on each request)**
+   Call `https://auth.enjab.ae/api/oauth/userinfo` with:
+   - Header: `Authorization: Bearer <access_token>`
+   - Always fetch fresh (set HTTP Cache-Control to `no-store` or equivalent in your language)
+
+   Returns the user object above.
+
+**Store the access token in a secure httpOnly cookie on the server.**
+The browser should never see this token. On each subsequent request, read it from the cookie and call `/api/oauth/userinfo` to get the fresh user object.
+
+## Security rules (do not skip)
+
+<Callout type="warn" title="Client secret is server-only">
+The `ENJAB_CLIENT_SECRET` must never be shipped to the browser. If it appears in client-side code or reaches the browser, rotate it immediately from the tool's page in Enjab Auth admin.
+</Callout>
+
+- **Redirect URI must be HTTPS on enjab.ae** and registered in Enjab Auth admin. Enjab refuses to send authorization codes to any other domain; this is what stops an attacker from harvesting logins.
+
+- **Store the access token in an httpOnly + secure + sameSite cookie.** Do not expose it to JavaScript. Set it with:
+  ```
+  httpOnly: true
+  secure: true
+  sameSite: lax (or strict)
+  path: /
+  ```
+
+- **Always derive the user from getUser()/userinfo.** Trust the `sub` field as the user's stable identity. Never trust user info that comes from the browser or your client code. Call `/api/oauth/userinfo` fresh on each request to catch sign-outs, role changes, and account disables immediately.
+
+- **Never cache the user object beyond the request.** A cached user object means revoked roles, disabled accounts, and central sign-outs will not reach your tool. Enjab cannot modify your cookie, so if you cache, a signed-out or disabled person keeps working.
