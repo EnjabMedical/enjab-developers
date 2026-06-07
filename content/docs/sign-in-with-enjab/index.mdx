@@ -11,7 +11,7 @@ Sign in with Enjab Auth is the central login for every Enjab tool. It is an OAut
 
 ## What Enjab Auth does (and does not)
 
-Enjab Auth handles all authentication: passwords, two-factor authentication (TOTP), sessions, lockout. Your tool never sees a password or a 2FA code and never builds a login screen.
+Enjab Auth handles all authentication: passwords, two-factor authentication (TOTP), sessions, lockout. Your tool never sees a password or a 2FA code and never builds a login screen. It enforces a strong password policy (12 to 24 characters, mixed character classes, never the person's name), a forced password change on first login (and after an admin reset) before anything else, and mandatory two-factor. Users manage their own password from Settings on the hub. There is exactly one super admin per organization.
 
 Enjab Auth handles authorization at the door: a user can only complete "Sign in with Enjab Auth" for your tool if an admin gave them access (via a role or a direct grant). If they cannot, Enjab Auth shows the "no access" screen and never returns to your tool.
 

@@ -9,6 +9,14 @@ contract version is `2026.06.07a`. To bring a tool up to date, see
 [Update an existing tool](/docs/update-an-existing-tool/auth) or use the combined update
 prompt on the [Changelog overview](/docs/changelog).
 
+## Stronger accounts: password policy, forced first change, one super admin
+
+`Enjab Auth` · 7 Jun 2026
+
+**Changed.** Enjab Auth now enforces account security centrally, none of which your tool implements: a strong password policy (12 to 24 characters, with an uppercase letter, a lowercase letter, a number, a symbol, and never the person's name), a forced password change on first login and after any admin reset (the user cannot continue until they set a new password, before two-factor), mandatory TOTP two-factor, and exactly one super admin per organization. Users can change their own password later from Settings on the hub.
+
+**Apply.** Nothing in your tool. All of this happens at auth.enjab.ae before a token is ever issued; your tool still just receives the user object.
+
 ## Disabled accounts are blocked at the door, is_active removed
 
 `Enjab Auth` · 7 Jun 2026
