@@ -81,7 +81,9 @@ Animations belong on landing and marketing pages only, implemented with Framer M
 **Dashboards and internal tools:** desktop-optimized but must stay phone-usable, never desktop-only or broken. The shared chrome already handles most of it: `@enjab-ui/sidebar` collapses to a hamburger drawer below `lg`, `@enjab-ui/dashboard-shell` stacks, and `@enjab-ui/data-table` scrolls horizontally inside its card.
 </Callout>
 
-For your own content on dashboards: stack grids to one column on small screens (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`), shrink page padding (`p-4 sm:p-6`), never set fixed pixel widths that overflow a phone, keep tap targets comfortable. Do NOT build a separate mobile design, just don't break.
+**Same functionality on every screen.** A small screen must do everything a desktop can, exactly. Collapse or restyle the layout to fit (stack grids, a hamburger drawer, icon buttons, horizontal scroll), but never hide, drop, or break a control on a phone. If a labelled button doesn't fit, make it an icon button, do not remove it or bury it behind something broken.
+
+For your own content on dashboards: stack grids to one column on small screens (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`), shrink page padding (`p-4 sm:p-6`), never set fixed pixel widths that overflow a phone, keep tap targets comfortable (at least `size-9`). Do NOT build a separate mobile design, and never leave a feature out of the phone layout.
 
 ## Logo & Branding
 
