@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/*
+  Enjab Developers theme. Light mode only by design (Enjab has no reversed palette).
+  Brand: teal #057C8B, navy #1B3766. Type: Inter (UI/headings) + Fragment Mono (code/data),
+  mirroring the Enjab UI design system at ui.enjab.ae.
+*/
+
+@theme {
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-fragment-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  /* surfaces */
+  --color-fd-background: #f6f8f9; /* Enjab canvas */
+  --color-fd-foreground: #0d0d0d; /* Enjab ink */
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #0d0d0d;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #0d0d0d;
+
+  /* brand */
+  --color-fd-primary: #057c8b; /* teal */
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-secondary: #edf1f2;
+  --color-fd-secondary-foreground: #1b3766; /* navy */
+  --color-fd-muted: #f1f3f5;
+  --color-fd-muted-foreground: #5e5e5e;
+  --color-fd-accent: #e6f3f4; /* teal tint */
+  --color-fd-accent-foreground: #054e59;
+
+  /* lines & focus */
+  --color-fd-border: #e9ecef;
+  --color-fd-ring: #057c8b;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}

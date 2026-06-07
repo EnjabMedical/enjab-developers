@@ -1,0 +1,64 @@
+---
+title: Update an existing tool
+description: Bring an app you already have up to the latest Enjab auth and UI standards, with a minimal change surface. Built to hand straight to an agent.
+icon: RefreshCw
+---
+
+Enjab evolves. This page is how you bring an existing tool up to the current standards
+without a rewrite. The rule is always the same: **apply only what changed, keep the change
+surface minimal.**
+
+## Update the UI
+
+Enjab UI ships changes through its [changelog](https://ui.enjab.ae/changelog), which lists
+exactly what to do per change. Hand your agent this message:
+
+```text title="Prompt for your agent"
+Update this project to the latest Enjab UI. Read https://ui.enjab.ae/llms.txt and
+https://ui.enjab.ae/changelog, then apply ONLY the changelog items this project has
+not adopted yet. Re-install changed components with `npx shadcn add @enjab-ui/<name>`
+(overwrite). Re-apply the theme if tokens changed. Do not refactor or restyle anything
+else, keep the change surface minimal.
+```
+
+What it does:
+
+<Steps>
+
+<Step>
+### Read the current rules + changelog
+[`ui.enjab.ae/llms.txt`](https://ui.enjab.ae/llms.txt) for the live rules,
+[`ui.enjab.ae/changelog`](https://ui.enjab.ae/changelog) for what changed and when.
+</Step>
+
+<Step>
+### Apply only the unadopted items
+Skip anything the project already has. Touch nothing unrelated.
+</Step>
+
+<Step>
+### Re-install changed components
+`npx shadcn add @enjab-ui/<name>` (overwrite when asked). Re-apply the theme with
+`npx shadcn add https://ui.enjab.ae/r/theme.json` if tokens changed.
+</Step>
+
+</Steps>
+
+## Update the auth integration
+
+Enjab Auth ships its current contract at
+[`auth.enjab.ae/llms.txt`](https://auth.enjab.ae/llms.txt). If you integrated a while ago,
+re-check it against the [Sign in with Enjab](/docs/sign-in-with-enjab) reference. The
+points most worth re-verifying:
+
+- **Re-validate every request.** `getUser()` must call `/userinfo` fresh
+  (`cache: "no-store"`). If your tool ever caches the user object, a signed-out or
+  disabled person keeps working — fix that first.
+- **No login UI of your own.** Signed-out visitors redirect straight to `/authorize`.
+- **Sign-out goes through Enjab's confirm page** and clears only your tool's session.
+- **Don't gate by role** unless your tool is role-aware; access is binary.
+
+<Callout type="warn" title="Minimal surface">
+Updates are not refactors. Change only what a changelog item or the auth contract
+requires, and leave the rest of the codebase exactly as it is.
+</Callout>

@@ -1,0 +1,59 @@
+---
+title: Get started
+description: How the Enjab tools fit together and the fastest path to a working tool — login plus on-brand UI.
+icon: Rocket
+---
+
+An **Enjab tool** is a web app that two Enjab services take care of for you:
+
+- **[Sign in with Enjab](/docs/sign-in-with-enjab)** handles _who the user is_ and
+  _whether they may use your tool_. You never build a login screen or touch a password.
+- **[Enjab UI](/docs/enjab-ui)** gives you the _look_ — a themed component registry and a
+  dashboard shell, so every Enjab tool feels like one product.
+
+You build the part in the middle: your tool's actual features. Everything else is
+provided.
+
+## The shape of an Enjab tool
+
+1. It lives on an **`enjab.ae`** domain (e.g. `yourtool.enjab.ae`). Auth refuses any
+   other domain.
+2. The instant a signed-out visitor touches any page, they are redirected to Enjab to
+   sign in. No login button, no login page of your own.
+3. Once signed in, you key all your own data by the user's stable Enjab id (`sub`).
+4. Your dashboard uses the Enjab UI shell, so the sidebar, account block, and the
+   "an Enjab product" byline are consistent with every other tool.
+
+## Fastest path
+
+<Steps>
+
+<Step>
+### Register the tool (one time)
+
+An Enjab admin adds your tool in [auth.enjab.ae/admin](https://auth.enjab.ae) and hands
+you a `ENJAB_CLIENT_ID` + `ENJAB_CLIENT_SECRET`. See
+[Sign in with Enjab → register](/docs/sign-in-with-enjab) for the exact steps.
+</Step>
+
+<Step>
+### Wire up login
+
+Drop in the four reference files (`lib/enjab-auth.ts`, the callback route, the logout
+route, and `proxy.ts`). Set your four environment variables. That is the whole
+integration — copy them from [Sign in with Enjab](/docs/sign-in-with-enjab).
+</Step>
+
+<Step>
+### Add the UI
+
+Install the Enjab UI chrome and theme, then build your screens with the registry
+components so your tool matches the rest of Enjab. See [Enjab UI](/docs/enjab-ui).
+</Step>
+
+</Steps>
+
+## Handing this to an agent
+
+Give your coding agent this site's [`/llms.txt`](/llms.txt) (or the specific page's raw
+markdown) and the task. The pages are written so the agent can do each step end to end.

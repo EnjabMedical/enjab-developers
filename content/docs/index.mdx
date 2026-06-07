@@ -1,0 +1,40 @@
+---
+title: Overview
+description: What Enjab is, the tools you can build on, and how this documentation works for both humans and coding agents.
+icon: Terminal
+---
+
+Welcome to **Enjab Developers** — the single source of truth for building on Enjab.
+
+Everything an Enjab tool needs is here: how to add **Sign in with Enjab**, how to ship
+on-brand UI with the **Enjab UI** design system, and how to bring an existing tool up to
+the latest standards. One central place, kept current, for every Enjab tool that exists
+today and every one we build next.
+
+## Built for agents first
+
+These docs are written so a **coding agent** can read them and do the work, with humans
+reading the same pages. Every page is a normal markdown file you can fetch raw:
+
+| Endpoint | What it returns |
+| --- | --- |
+| [`/llms.txt`](/llms.txt) | The index of every page, with links |
+| [`/llms-full.txt`](/llms-full.txt) | Every page concatenated into one document |
+| `/llms.mdx/docs/<path>/content.md` | A single page, raw markdown |
+
+Point an agent at `/llms.txt` and let it pull the pages it needs. No separate "agent
+version" of the docs — the page you read is the page the agent reads.
+
+## The tools
+
+<Cards>
+  <Card title="Sign in with Enjab" href="/docs/sign-in-with-enjab" description="Use Enjab as your identity provider. Login, two-factor, sessions, roles, and access control — all handled centrally." />
+  <Card title="Enjab UI" href="/docs/enjab-ui" description="The Enjab design system. Install themed components from the registry and ship a consistent, on-brand interface." />
+  <Card title="Update an existing tool" href="/docs/update-an-existing-tool" description="Bring an app you already have up to the latest Enjab auth + UI standards, change-surface minimal." />
+</Cards>
+
+## Where to start
+
+If you are building a new tool, read [Get started](/docs/get-started) first — it covers
+how the pieces fit together and the fastest path to a working integration. If you are an
+agent, start at [`/llms.txt`](/llms.txt).
