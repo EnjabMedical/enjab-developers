@@ -4,33 +4,34 @@ description: Update an existing tool to the latest Enjab UI components and desig
 icon: Paintbrush
 ---
 
-When Enjab UI changes, these docs describe the current standard. Update your project to match them.
+When Enjab UI changes, the [Changelog](/docs/changelog) lists exactly what changed and the action to adopt it. Update your project by applying the entries you have not adopted yet.
 
 ## The update prompt
 
 Hand an agent this message:
 
 ```
-Update this project to the latest Enjab UI. Read https://developers.enjab.ae/llms.txt,
-then apply ONLY the standards this project has not adopted yet. Re-install changed components with `npx shadcn add @enjab-ui/<name>`
-(overwrite). Re-apply the theme if tokens changed. Do not refactor or restyle anything
-else, keep the change surface minimal.
+Update this project to the latest Enjab UI. Read https://developers.enjab.ae/llms.txt and
+the changelog at https://developers.enjab.ae/docs/changelog, then apply ONLY the changelog
+items this project has not adopted yet. Re-install changed components with
+`npx shadcn add @enjab-ui/<name>` (overwrite). Re-apply the theme if tokens changed.
+Do not refactor or restyle anything else, keep the change surface minimal.
 ```
 
-The agent will fetch the docs, check your project against the current standard, and apply only what you haven't already adopted.
+The agent will fetch the docs and the changelog, check your project against the latest entries, and apply only what you have not already adopted.
 
 ## How updates work
 
 <Steps>
 <Step>
-### Read the current standard
+### Read the changelog
 
-Read https://developers.enjab.ae/llms.txt (these docs as plain text). Note the current component versions and design tokens.
+Read the [Changelog](/docs/changelog) (or fetch `https://developers.enjab.ae/docs/changelog`). Note which components and design tokens changed.
 </Step>
 <Step>
 ### Identify what you need
 
-Compare your project's installed components against the current docs. You only need to update the components and theme items your tool actually uses.
+Compare your project's installed components against the changelog. You only need to update the components and theme items your tool actually uses.
 </Step>
 <Step>
 ### Reinstall changed components

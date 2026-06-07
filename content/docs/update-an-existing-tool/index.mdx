@@ -7,7 +7,7 @@ icon: RefreshCw
 When Enjab UI changes, update your project to track the latest contract. The core principle is minimal surface: apply ONLY what changed, keep the change set tight, do not refactor or restyle anything else.
 
 <Callout type="info" title="Minimal surface">
-Updates are not refactors. When the design system or theme tokens shift, send your agent these docs, have them identify which standards your tool has not adopted yet, and apply exactly those. Re-install changed components with `npx shadcn add @enjab-ui/<name>` (overwrite). Re-apply theme tokens if they changed. Stop there. Do not restyle or reorganize surrounding code.
+Updates are not refactors. When the design system or theme tokens shift, send your agent the [Changelog](/docs/changelog), have them identify which entries your tool has not adopted yet, and apply exactly those. Re-install changed components with `npx shadcn add @enjab-ui/<name>` (overwrite). Re-apply theme tokens if they changed. Stop there. Do not restyle or reorganize surrounding code.
 </Callout>
 
 ## Update the UI
@@ -27,5 +27,6 @@ When Enjab UI ships new component versions or design token changes, read these d
 The single source of truth for every Enjab tool is this site, published as plain text for agents:
 
 - **The contract**: https://developers.enjab.ae/llms.txt
+- **What changed**: the [Changelog](/docs/changelog)
 
-Hand this file to your agent and they can bring your tool up to the current standard.
+Hand both to your agent and they can bring your tool up to the current standard, applying only the delta.

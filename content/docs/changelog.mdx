@@ -1,0 +1,149 @@
+---
+title: Changelog
+description: What changed across the Enjab tools and the exact action to bring your project up to date. The single, central changelog for the Enjab platform.
+icon: ScrollText
+---
+
+This is the central changelog for the Enjab platform. Each entry says what changed and
+the exact action to adopt it. To bring an existing tool up to date, see
+[Update an existing tool](/docs/update-an-existing-tool).
+
+Entries are tagged by area (`Enjab UI`, `Enjab Auth`). Newest first.
+
+<Callout title="Update prompt, hand to any agent">
+```text
+Update this project to the latest Enjab standards. Read https://developers.enjab.ae/llms.txt
+and the changelog at https://developers.enjab.ae/docs/changelog, then apply ONLY the
+changelog items this project has not adopted yet. Re-install changed components with
+`npx shadcn add @enjab-ui/<name>` (overwrite). Re-apply the theme if tokens changed.
+Do not refactor or restyle anything else, keep the change surface minimal.
+```
+</Callout>
+
+## 2026.06.06l: Dashboards are responsive (phone-usable)
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** The shell is responsive now: `@enjab-ui/sidebar` collapses to a hamburger drawer below `lg`, `dashboard-shell` stacks, `page-header` tightens. `data-table` already scrolls. New rule: landing pages fully responsive; dashboards desktop-optimized but phone-usable (stack grids, `p-4 sm:p-6`), never desktop-only.
+
+**Apply.** Re-install: `npx shadcn add @enjab-ui/sidebar @enjab-ui/dashboard-shell @enjab-ui/page-header`. Make your content stack on small screens (`grid-cols-1 sm:grid-cols-2 ...`).
+
+## 2026.06.06k: Tools show their OWN brand (Enjab logo moves to the byline)
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** New `@enjab-ui/app-mark`: a tool's own mark (the gradient favicon square + the tool name). The sidebar brand header now shows this (pass `appName` + `appIcon`), not the Enjab logo. The Enjab parent logo now appears only in the "an Enjab product" byline. Demo dashboard + landing updated.
+
+**Apply.** Install `@enjab-ui/app-mark` and pass `appName` + `appIcon` (the same glyph as your favicon) to `@enjab-ui/sidebar`. Re-install sidebar. Use the Enjab logo only in the byline.
+
+## 2026.06.06j: Favicon and in-app icon must match
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** New rule: a tool's favicon and any in-app icon or brand mark must be the SAME image. The favicon glyph is canonical; mirror it into one small component so the tab icon and the on-screen mark cannot drift. Also: customize the favicon glyph with inline SVG (Lucide React components do not render in the icon generator).
+
+**Apply.** When you set a custom favicon glyph, render the identical mark (same gradient square + glyph) anywhere the app shows its own icon.
+
+## 2026.06.06h: Favicon is now customizable (swap the letter or use an icon)
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** `@enjab-ui/favicon` is code-generated: `app/icon.tsx` + `app/apple-icon.tsx` render the Enjab gradient square with a glyph. Edit the `GLYPH` constant to use a different letter or paste an icon's inline SVG (Lucide React components do not render in the generator). PNG output, so it works in Safari with no separate `.ico`. Default stays "E".
+
+**Apply.** Re-install: `npx shadcn add @enjab-ui/favicon`. Delete any old `app/icon.svg` so it does not clash. To brand a tool, set `GLYPH` in `app/icon.tsx` + `app/apple-icon.tsx`.
+
+## 2026.06.06g: Buttons show a loading state
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** Button gained a `loading` prop: it disables itself and shows a spinner while an async action runs. New rule: any button whose action takes time must use it (or `useFormStatus` for server-action forms), never stay clickable and silent.
+
+**Apply.** Re-install: `npx shadcn add @enjab-ui/button`. Use `<Button loading={busy}>...</Button>` for slow actions.
+
+## 2026.06.06f: Alert component (success / info / warning / danger)
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** New `@enjab-ui/alert`: one consistent in-page message box in four tones. Icon + title carry the meaning, so status is never color alone. Replaces hand-rolled colored notice boxes.
+
+**Apply.** Install: `npx shadcn add @enjab-ui/alert`. Use it for persistent, view-tied messages (form errors, warnings, success/info notices). Keep using a toast for transient feedback and `status-pill` for per-row status.
+
+## 2026.06.06e: Tables are strict now (no more ugly tables)
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** `data-table` is fully self-styled: comfortable rows, mono uppercase headers, soft line separators, and a canvas hover, all enforced inside the component. It no longer inherits the cramped shadcn table defaults, so every Enjab tool's tables look identical to the demo dashboard. The base table primitive is Enjab-styled too (same padding, header, borders, hover), so even a raw table cannot drift.
+
+**Apply.** Re-install: `npx shadcn add @enjab-ui/data-table`. Build all tables from it (never hand-roll a table).
+
+## 2026.06.06d: Account block is now identical everywhere
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** `sidebar-footer` always renders the same two lines (display name + email + Sign out); derives the name from the email when none is given, so it cannot drift between tools.
+
+**Apply.** Re-install: `npx shadcn add @enjab-ui/sidebar-footer @enjab-ui/sidebar`.
+
+## 2026.06.06c: Ready dashboard chrome (sidebar, shell, header, table)
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** New `@enjab-ui/sidebar`, `dashboard-shell`, `page-header`, `data-table` so every tool's chrome is identical. `logo` now loads from the hosted URL; `sidebar-footer` handles email-only accounts.
+
+**Apply.** Build dashboards from these (do not hand-roll the sidebar, topbar, or table): `npx shadcn add @enjab-ui/sidebar @enjab-ui/dashboard-shell @enjab-ui/page-header @enjab-ui/data-table`. Re-install `logo` + `sidebar-footer` for the fixes.
+
+## 2026.06.06b: Instant navigation with skeletons
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** Screens open instantly with a Skeleton while data loads, never a blank or frozen page.
+
+**Apply.** Add a `loading.tsx` to every data-fetching route, with a skeleton that mirrors the layout (`animate-pulse` on `bg-muted`, no layout shift).
+
+## 2026.06.06: Favicon needs a raster for Safari
+
+`Enjab UI` · 6 Jun 2026
+
+**Changed.** The favicon rule then required a raster, not just SVG, because Safari ignores SVG-only favicons (blank tab). Superseded by the code-generated PNG favicon (see 2026.06.06h).
+
+**Apply.** Move to the code-generated favicon: `npx shadcn add @enjab-ui/favicon`.
+
+## 2026.06.05d: Favicon required
+
+`Enjab UI` · 5 Jun 2026
+
+**Changed.** New `@enjab-ui/favicon`. Every Enjab project must ship a favicon, no exceptions.
+
+**Apply.** Add it: `npx shadcn add @enjab-ui/favicon`.
+
+## 2026.06.05c: Bigger Enjab byline logo
+
+`Enjab UI` · 5 Jun 2026
+
+**Changed.** The "an Enjab product" byline logo is larger for legibility.
+
+**Apply.** Re-install: `npx shadcn add @enjab-ui/enjab-byline` (and `@enjab-ui/sidebar-footer`).
+
+## 2026.06.05b: Required sidebar footer + Enjab byline
+
+`Enjab UI` · 5 Jun 2026
+
+**Changed.** New `@enjab-ui/sidebar-footer`: account block (avatar, email, sign out) plus the byline. New `@enjab-ui/enjab-byline`: standalone byline for dashboards with no sidebar.
+
+**Apply.** Every dashboard must show the byline. Sidebar: put `sidebar-footer` at the very bottom. No sidebar: place `enjab-byline` anywhere.
+
+## 2026.06.05a: Typography: Inter Display headings
+
+`Enjab UI` · 5 Jun 2026
+
+**Changed.** Headings use Inter Display, body Satoshi, data Fragment Mono (matches enjab.ae). Earlier builds wrongly used Satoshi for headings.
+
+**Apply.** Headings must use the heading font (`font-heading` or any `h1`-`h6`), never Satoshi. Re-apply the theme: `npx shadcn add https://ui.enjab.ae/r/theme.json`.
+
+## 2026.06.04: Enjab UI registry published
+
+`Enjab UI` · 4 Jun 2026
+
+**Changed.** Initial registry: `theme`, `button`, `status-pill`, `stat-card`, `logo`, `reveal`.
+
+**Apply.** Set up per the [Enjab UI](/docs/enjab-ui) docs.
