@@ -27,23 +27,23 @@ All parameters are required:
 - `client_id`: your tool's ID (from Enjab Auth admin)
 - `redirect_uri`: must be registered on your tool's page (default `https://<your-domain>/api/auth/callback`)
 - `response_type=code`
-- `state`: the page the user was trying to reach; Enjab returns it unchanged
+- `state`: the page the user was trying to reach; Enjab Auth returns it unchanged
 
 Optional: add PKCE `code_challenge` (S256) if your tool supports it.
 </Step>
 
 <Step>
-### Enjab authenticates and authorizes
+### Enjab Auth authenticates and authorizes
 
-Enjab asks for a password + two-factor (TOTP) if needed. It checks the user's access: if an admin gave them a role or direct grant for your tool, they pass. If not, Enjab shows "no access" and never returns to your tool.
+Enjab Auth asks for a password + two-factor (TOTP) if needed. It checks the user's access: if an admin gave them a role or direct grant for your tool, they pass. If not, Enjab Auth shows "no access" and never returns to your tool.
 
-If authorized, Enjab shows a greeting + consent screen ("Welcome, Sara. You have access to `<tool>`. `<tool>` will receive your name, email, role..."), then a Continue button.
+If authorized, Enjab Auth shows a greeting + consent screen ("Welcome, Sara. You have access to `<tool>`. `<tool>` will receive your name, email, role..."), then a Continue button.
 </Step>
 
 <Step>
-### Enjab redirects back with a code
+### Enjab Auth redirects back with a code
 
-On continue, Enjab sends the browser back:
+On continue, Enjab Auth sends the browser back:
 ```
 https://<your-redirect-uri>?code=<one-time-code>&state=<return-path>
 ```
@@ -70,10 +70,10 @@ On later requests, fetch the fresh user by calling `/api/oauth/userinfo` with th
 
 ## Redirect instantly (no login button)
 
-Do NOT build a "Sign in with Enjab Auth" button or any login screen. The moment a signed-out user touches ANY page of your tool, your middleware redirects them straight to `/authorize`. Enjab shows the login and the greeting screen. Your tool never builds a login UI.
+Do NOT build a "Sign in with Enjab Auth" button or any login screen. The moment a signed-out user touches ANY page of your tool, your middleware redirects them straight to `/authorize`. Enjab Auth shows the login and the greeting screen. Your tool never builds a login UI.
 
 <Callout type="warn" title="Middleware check on every request">
-On each request, always call `/api/oauth/userinfo` with the stored access token to get the fresh user. Do NOT cache the user object beyond the request or trust your session cookie's claims. This is the only way central sign-out, account disable, and role changes reach your tool. Enjab cannot modify your cookie, so if you cache the user, a signed-out or disabled person keeps working.
+On each request, always call `/api/oauth/userinfo` with the stored access token to get the fresh user. Do NOT cache the user object beyond the request or trust your session cookie's claims. This is the only way central sign-out, account disable, and role changes reach your tool. Enjab Auth cannot modify your cookie, so if you cache the user, a signed-out or disabled person keeps working.
 </Callout>
 
 ## Endpoints
@@ -117,8 +117,7 @@ Server-to-server only. Swap the authorization code for an access token and user 
     "email": "sara@enjab.ae",
     "name": "Sara Ahmed",
     "roles": ["reception"],
-    "is_super_admin": false,
-    "is_active": true
+    "is_super_admin": false
   }
 }
 ```

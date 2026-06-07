@@ -4,7 +4,7 @@ description: "Wire the Enjab UI dashboard shell to your signed-in user, complete
 icon: LayoutDashboard
 ---
 
-Install the Enjab dashboard chrome, sidebar, and page header components:
+Install the Enjab Auth dashboard chrome, sidebar, and page header components:
 
 ```
 npx shadcn add @enjab-ui/dashboard-shell @enjab-ui/sidebar @enjab-ui/page-header
@@ -45,7 +45,7 @@ export function AppShell({ user, children }: { user: EnjabUser; children: React.
     <DashboardShell
       sidebar={
         <Sidebar
-          appName="Your Tool"                            // YOUR tool's name (not "Enjab")
+          appName="Your Tool"                            // YOUR tool's name (not "Enjab Auth")
           appIcon={GLYPH}                                // same glyph as your favicon
           groups={NAV}
           user={user}                                    // getUser() plugs straight in: real name + email
@@ -63,7 +63,7 @@ The sidebar top shows your tool's mark (its favicon square and name), never the 
 
 ## Dashboard layout
 
-Create `app/dashboard/layout.tsx` as a server component that fetches the signed-in user and renders the AppShell. If the user is not signed in, redirect to Enjab's login.
+Create `app/dashboard/layout.tsx` as a server component that fetches the signed-in user and renders the AppShell. If the user is not signed in, redirect to Enjab Auth's login.
 
 ```tsx title="app/dashboard/layout.tsx"
 import { redirect } from "next/navigation";
@@ -96,7 +96,7 @@ export default function Page() {
 
 ## Sign-out flow
 
-The sidebar footer shows the real signed-in person, and its Sign out button goes to Enjab's confirm page first (so nothing happens on an accidental click), then clears only this tool's session and shows "You're signed out of `<tool>`". The central Enjab session stays, so the user remains signed in to Enjab and other tools and can jump back into this tool without logging in again.
+The sidebar footer shows the real signed-in person, and its Sign out button goes to Enjab Auth's confirm page first (so nothing happens on an accidental click), then clears only this tool's session and shows "You're signed out of `<tool>`". The central Enjab Auth session stays, so the user remains signed in to Enjab Auth and other tools and can jump back into this tool without logging in again.
 
 <Cards>
   <Card

@@ -35,7 +35,6 @@ export type EnjabUser = {
   sub: string; email: string; name: string;
   roles?: string[];          // present only if the tool is role-aware
   is_super_admin?: boolean;  // present only if the tool is role-aware
-  is_active: boolean;
 };
 
 export function loginUrl(returnPath = "/") {
@@ -78,7 +77,7 @@ export async function exchangeCode(code: string): Promise<string | null> {
 
 ## OAuth callback
 
-Handles the redirect from Enjab after sign-in. Exchanges the auth code for a token, stores it in a secure cookie, and returns the user to their requested page.
+Handles the redirect from Enjab Auth after sign-in. Exchanges the auth code for a token, stores it in a secure cookie, and returns the user to their requested page.
 
 ```ts title="app/api/auth/callback/route.ts"
 import { NextResponse, type NextRequest } from "next/server";
@@ -102,7 +101,7 @@ export async function GET(req: NextRequest) {
 
 ## Sign-out
 
-Redirects to Enjab's sign-out confirmation page first, so an accidental click never logs the user out. Only signs out of this tool, not the central Enjab session.
+Redirects to Enjab Auth's sign-out confirmation page first, so an accidental click never logs the user out. Only signs out of this tool, not the central Enjab Auth session.
 
 ```ts title="app/api/auth/logout/route.ts"
 import { NextResponse, type NextRequest } from "next/server";
@@ -110,10 +109,10 @@ import { SESSION_COOKIE } from "@/lib/enjab-auth";
 
 const ISSUER = process.env.ENJAB_ISSUER ?? "https://auth.enjab.ae";
 
-// Sign-out ALWAYS goes through Enjab's confirm page first (so a stray/accidental click
-// can't log anyone out), and clears ONLY this tool's session, never the central Enjab
-// session. Flow: the Sign out button navigates here -> we send the user to Enjab's
-// /logout confirm -> on confirm, Enjab sends them back here with ?confirmed=1 -> we
+// Sign-out ALWAYS goes through Enjab Auth's confirm page first (so a stray/accidental click
+// can't log anyone out), and clears ONLY this tool's session, never the central Enjab Auth
+// session. Flow: the Sign out button navigates here -> we send the user to Enjab Auth's
+// /logout confirm -> on confirm, Enjab Auth sends them back here with ?confirmed=1 -> we
 // clear our cookie and show the "You're signed out of <tool>" page. Do NOT clear the
 // cookie or call any signout before ?confirmed=1, or you'll skip the confirmation.
 export async function GET(req: NextRequest) {
@@ -128,7 +127,7 @@ export async function GET(req: NextRequest) {
 
 ## Middleware
 
-Redirects unsigned users straight to Enjab. No login button, no login page. The moment an unsigned user touches any route, they go to Enjab's login and consent flow.
+Redirects unsigned users straight to Enjab Auth. No login button, no login page. The moment an unsigned user touches any route, they go to Enjab Auth's login and consent flow.
 
 ```ts title="proxy.ts"
 import { NextResponse, type NextRequest } from "next/server";
@@ -155,7 +154,7 @@ export const config = {
 
 ## Using it in a page
 
-Fetch the user with `getUser()`. If it returns null, the token expired between requests, so redirect to login. Gate by role only if your tool is role-aware (an Enjab admin has marked it so).
+Fetch the user with `getUser()`. If it returns null, the token expired between requests, so redirect to login. Gate by role only if your tool is role-aware (an Enjab Auth admin has marked it so).
 
 ```ts title="Example page"
 import { redirect } from "next/navigation";
@@ -175,5 +174,5 @@ export default async function Page() {
 ```
 
 <Callout type="info" title="Always validate on each request">
-Call `getUser()` on every request that needs the user. It fetches fresh from Enjab (cache: "no-store"), so role changes, sign-outs, and account disables take effect right away. Never cache the user object beyond the request or trust your cookie's claims.
+Call `getUser()` on every request that needs the user. It fetches fresh from Enjab Auth (cache: "no-store"), so role changes, sign-outs, and account disables take effect right away. Never cache the user object beyond the request or trust your cookie's claims.
 </Callout>

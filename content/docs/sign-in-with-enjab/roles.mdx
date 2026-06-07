@@ -6,13 +6,13 @@ icon: ShieldCheck
 
 ## When to use roles
 
-Access is binary. An admin gives a user access to your tool via a role or a direct grant. Enjab enforces that at the door. If the user reaches your tool, they are allowed to use it.
+Access is binary. An admin gives a user access to your tool via a role or a direct grant. Enjab Auth enforces that at the door. If the user reaches your tool, they are allowed to use it.
 
 Turn on roles only when your tool has functions that not every authorized user should reach, such as an admin-only settings page inside the tool.
 
 ## Enabling roles
 
-An Enjab admin flips your tool to "role-aware" (Admin > Tools > your tool > Role-aware). From then on, the `user` object includes `roles` (global keys like `reception`, `doctor`) and `is_super_admin`.
+An Enjab Auth admin flips your tool to "role-aware" (Admin > Tools > your tool > Role-aware). From then on, the `user` object includes `roles` (global keys like `reception`, `doctor`) and `is_super_admin`.
 
 Without the flag, `roles` and `is_super_admin` are omitted from the user object.
 
@@ -26,8 +26,7 @@ When your tool is role-aware, `getUser()` returns:
   "email": "sara@enjab.ae",
   "name": "Sara Ahmed",
   "roles": ["reception"],
-  "is_super_admin": false,
-  "is_active": true
+  "is_super_admin": false
 }
 ```
 

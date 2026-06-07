@@ -9,46 +9,45 @@ Sign in with Enjab Auth is the central login for every Enjab tool. It is an OAut
 - **Issuer:** https://auth.enjab.ae
 - **Discovery:** https://auth.enjab.ae/.well-known/openid-configuration
 
-## What Enjab does (and does not)
+## What Enjab Auth does (and does not)
 
-Enjab handles all authentication: passwords, two-factor authentication (TOTP), sessions, lockout. Your tool never sees a password or a 2FA code and never builds a login screen.
+Enjab Auth handles all authentication: passwords, two-factor authentication (TOTP), sessions, lockout. Your tool never sees a password or a 2FA code and never builds a login screen.
 
-Enjab handles authorization at the door: a user can only complete "Sign in with Enjab Auth" for your tool if an admin gave them access (via a role or a direct grant). If they cannot, Enjab shows the "no access" screen and never returns to your tool.
+Enjab Auth handles authorization at the door: a user can only complete "Sign in with Enjab Auth" for your tool if an admin gave them access (via a role or a direct grant). If they cannot, Enjab Auth shows the "no access" screen and never returns to your tool.
 
-Enjab shows the user a greeting plus consent screen on the way in ("Welcome, Sara. You have access to `<tool>`. `<tool>` will receive your name, email, role..."), then a Continue button sends them back to you. Your tool does not build this; Enjab owns it.
+Enjab Auth shows the user a greeting plus consent screen on the way in ("Welcome, Sara. You have access to `<tool>`. `<tool>` will receive your name, email, role..."), then a Continue button sends them back to you. Your tool does not build this; Enjab Auth owns it.
 
-Sign-out is confirmed on Enjab and per-tool. Your "Sign out" button just navigates to your `/api/auth/logout` route; Enjab shows a confirm page first (so an accidental click never logs anyone out), and confirming drops only your tool, never the central Enjab session. Signing out of Enjab itself (from the Enjab hub) ends everything: it revokes every access token issued to you, so each tool loses access on its next `/userinfo` check. Never call signOut or clear the session yourself.
+Sign-out is confirmed on Enjab Auth and per-tool. Your "Sign out" button just navigates to your `/api/auth/logout` route; Enjab Auth shows a confirm page first (so an accidental click never logs anyone out), and confirming drops only your tool, never the central Enjab Auth session. Signing out of Enjab Auth itself (from the Enjab Auth hub) ends everything: it revokes every access token issued to you, so each tool loses access on its next `/userinfo` check. Never call signOut or clear the session yourself.
 
-It tells your tool who the user is. By default it does NOT send roles and you must NOT gate by role: if Enjab let the user in, that is the whole decision. Roles are sent only if an admin marks your tool "role-aware" (see Roles).
+It tells your tool who the user is. By default it does NOT send roles and you must NOT gate by role: if Enjab Auth let the user in, that is the whole decision. Roles are sent only if an admin marks your tool "role-aware" (see Roles).
 
-It stores only identity plus access. It does NOT store your app's data. Key all your own records by the user's `sub` (the stable Enjab user id).
+It stores only identity plus access. It does NOT store your app's data. Key all your own records by the user's `sub` (the stable Enjab Auth user id).
 
-Your tool builds no login button and no login page. The instant a signed-out user touches any page, redirect straight to Enjab (see the Flow guide).
+Your tool builds no login button and no login page. The instant a signed-out user touches any page, redirect straight to Enjab Auth (see the Flow guide).
 
 <Callout type="warn" title="Re-validate every request">
-On each request, read the user with `getUser()`, which calls `/userinfo` fresh (cache: "no-store"). Do NOT cache the user object beyond the request or trust your cookie's claims. This is the ONLY way central sign-out, account disable, and role changes reach your tool. Enjab cannot touch your cookie, so if you cache the user, a signed-out or disabled person keeps working.
+On each request, read the user with `getUser()`, which calls `/userinfo` fresh (cache: "no-store"). Do NOT cache the user object beyond the request or trust your cookie's claims. This is the ONLY way central sign-out, account disable, and role changes reach your tool. Enjab Auth cannot touch your cookie, so if you cache the user, a signed-out or disabled person keeps working.
 </Callout>
 
 ## The user object your tool receives
 
 ```json
 {
-  "sub": "0f3c...",            // stable Enjab user id - your foreign key for this user
+  "sub": "0f3c...",            // stable Enjab Auth user id - your foreign key for this user
   "email": "sara@enjab.ae",
-  "name": "Sara Ahmed",        // the person's name, set in Enjab admin - greet them with it
+  "name": "Sara Ahmed",        // the person's name, set in Enjab Auth admin - greet them with it
   "roles": ["reception"],      // ONLY present if your tool is role-aware; otherwise omitted
-  "is_super_admin": false,     // ONLY present if your tool is role-aware; otherwise omitted
-  "is_active": true
+  "is_super_admin": false      // ONLY present if your tool is role-aware; otherwise omitted
 }
 ```
 
-Most tools never see `roles` or `is_super_admin` at all (the keys are absent) and should not branch on them. Only role-aware tools receive the org's authorization details; a super admin has `is_super_admin: true` and access to every tool.
+There is no `is_active` flag: Enjab Auth blocks a disabled account at the door, so any user your tool receives is active. Most tools never see `roles` or `is_super_admin` at all (the keys are absent) and should not branch on them. Only role-aware tools receive the org's authorization details; a super admin has `is_super_admin: true` and access to every tool.
 
 ## Most tools never need roles
 
-Access is binary. An admin gives a user access to your tool (via a role or a direct grant); Enjab enforces that at the door. If the user reaches your tool, they are allowed to use it. That is enough for almost every tool. Do not gate features by role.
+Access is binary. An admin gives a user access to your tool (via a role or a direct grant); Enjab Auth enforces that at the door. If the user reaches your tool, they are allowed to use it. That is enough for almost every tool. Do not gate features by role.
 
-Turn on roles ONLY when your tool has functions that not every authorized user should reach (for example, an admin-only settings page inside the tool). Then an Enjab admin flips your tool to "role-aware" (Admin -> Tools -> your tool -> Role-aware), and from then on the `user` object includes `roles` (global keys like `reception`, `doctor`). You gate with `user.roles?.includes("reception")`. If the flag is off, `roles` is omitted.
+Turn on roles ONLY when your tool has functions that not every authorized user should reach (for example, an admin-only settings page inside the tool). Then an Enjab Auth admin flips your tool to "role-aware" (Admin -> Tools -> your tool -> Role-aware), and from then on the `user` object includes `roles` (global keys like `reception`, `doctor`). You gate with `user.roles?.includes("reception")`. If the flag is off, `roles` is omitted.
 
 <Cards>
   <Card

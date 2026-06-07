@@ -1,32 +1,39 @@
 ---
 title: Overview
-description: Principles for updating an existing Enjab tool without refactoring the codebase.
+description: Bring an existing Enjab tool up to date on both Enjab UI and Enjab Auth, with a minimal change surface.
 icon: RefreshCw
 ---
 
-When Enjab UI changes, update your project to track the latest contract. The core principle is minimal surface: apply ONLY what changed, keep the change set tight, do not refactor or restyle anything else.
+Enjab evolves. Updating a tool means tracking two contracts, the **Enjab UI** design system
+and the **Enjab Auth** integration, and adopting only what changed. The principle is always
+the same: apply ONLY the changelog entries your tool has not adopted, and touch nothing else.
 
 <Callout type="info" title="Minimal surface">
-Updates are not refactors. When the design system or theme tokens shift, send your agent the [Changelog](/docs/changelog), have them identify which entries your tool has not adopted yet, and apply exactly those. Re-install changed components with `npx shadcn add @enjab-ui/<name>` (overwrite). Re-apply theme tokens if they changed. Stop there. Do not restyle or reorganize surrounding code.
+Updates are not refactors. Send your agent the [Changelog](/docs/changelog), have them
+identify which entries your tool has not adopted yet, and apply exactly those. Stop there.
+Do not restyle or reorganize surrounding code.
 </Callout>
 
-## Update the UI
-
-When Enjab UI ships new component versions or design token changes, read these docs and apply only the standards your project has not yet adopted.
+## Two tracks
 
 <Cards>
-<Card 
-  title="Update the UI" 
-  href="/docs/update-an-existing-tool/ui" 
-  description="When Enjab UI ships new component versions or design token changes, read these docs and apply only the standards your project has not yet adopted."
-/>
+  <Card title="Update the UI" href="/docs/update-an-existing-tool/ui" description="Re-install changed Enjab UI components and re-apply the theme, per the Enjab UI changelog." />
+  <Card title="Update the auth integration" href="/docs/update-an-existing-tool/auth" description="Re-sync the drop-in reference files and re-check the integration rules, per the Enjab Auth changelog." />
 </Cards>
+
+## Update everything at once
+
+To bring a tool up to date on both UI and Auth in one go, use the single
+[update-everything prompt](/docs/changelog) on the changelog overview. It reads the central
+docs and both changelogs, works out what your project is missing, and applies only that.
 
 ## Live contract
 
-The single source of truth for every Enjab tool is this site, published as plain text for agents:
+This site is the single source of truth for every Enjab tool, published as plain text for
+agents:
 
 - **The contract**: https://developers.enjab.ae/llms.txt
-- **What changed**: the [Changelog](/docs/changelog)
+- **What changed**: the [Changelog](/docs/changelog) ([Enjab UI](/docs/changelog/enjab-ui), [Enjab Auth](/docs/changelog/enjab-auth))
 
-Hand both to your agent and they can bring your tool up to the current standard, applying only the delta.
+Hand these to your agent and they can bring your tool up to the current standard, applying
+only the delta.

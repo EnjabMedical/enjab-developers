@@ -4,7 +4,7 @@ description: "Register your tool with Enjab Auth and configure environment varia
 icon: ClipboardCheck
 ---
 
-An Enjab admin registers your tool once in Enjab Auth admin, then shares the credentials with your team.
+An Enjab Auth admin registers your tool once in Enjab Auth admin, then shares the credentials with your team.
 
 <Steps>
 <Step>
@@ -38,7 +38,7 @@ The redirect URI must be:
 - On your registered domain
 - Path can be any route your tool owns (default path is `/api/auth/callback`)
 
-Enjab locks the host to your domain and refuses redirects to any other host.
+Enjab Auth locks the host to your domain and refuses redirects to any other host.
 
 </Step>
 <Step>
@@ -49,7 +49,7 @@ If your tool has features that not every authorized user should access (e.g. an 
 - Attach this tool to the roles that should reach it
 - Assign those roles to employees
 
-By default, access is binary: if Enjab lets the user in, they can use your tool. Only enable roles if you need to gate features by role inside the tool (see [Roles](/docs/sign-in-with-enjab/roles) for details on how to check roles in code).
+By default, access is binary: if Enjab Auth lets the user in, they can use your tool. Only enable roles if you need to gate features by role inside the tool (see [Roles](/docs/sign-in-with-enjab/roles) for details on how to check roles in code).
 
 </Step>
 </Steps>

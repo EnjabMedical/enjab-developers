@@ -1,0 +1,90 @@
+---
+title: Enjab Auth
+description: Version history for Sign in with Enjab Auth. Each entry says what changed in the integration contract and the exact action to adopt it.
+icon: KeyRound
+---
+
+Changes to [Sign in with Enjab Auth](/docs/sign-in-with-enjab), newest first. The current
+contract version is `2026.06.07a`. To bring a tool up to date, see
+[Update an existing tool](/docs/update-an-existing-tool/auth) or use the combined update
+prompt on the [Changelog overview](/docs/changelog).
+
+## Disabled accounts are blocked at the door, is_active removed
+
+`Enjab Auth` · 7 Jun 2026
+
+**Changed.** A disabled account is now stopped wherever it appears, with a plain "your account is disabled" message: at login (signed out, not let in), on the hub, and on the consent screen. Because a tool can therefore only ever receive an active user, the `is_active` field is removed from the user object (token response and `/userinfo`), the `EnjabUser` type, and the OpenID `claims_supported` list.
+
+**Apply.** Delete `is_active` from your `EnjabUser` type and any code that read it (it was always `true`). No other change is needed.
+
+## Redirect host locked to the domain, path is editable
+
+`Enjab Auth` · 7 Jun 2026
+
+**Changed.** A tool's `redirect_uri` host is locked to its registered domain; you choose only the path (default `/api/auth/callback`). Changing a tool's domain in admin severs the old domain: it drops the old redirect from the allowlist and revokes that tool's sessions.
+
+**Apply.** Keep your callback on your registered `enjab.ae` domain. If an admin changes your tool's domain, update `ENJAB_REDIRECT_URI` to match and re-authenticate.
+
+## Central sign-out revokes every issued token
+
+`Enjab Auth` · 6 Jun 2026
+
+**Changed.** Signing out of Enjab Auth itself (the hub) now revokes every access token issued to every tool. Each tool loses access on its next `/userinfo` check.
+
+**Apply.** Re-validate every request with `getUser()` (it calls `/userinfo` fresh, `cache: "no-store"`). Never cache the user object beyond the request, or a signed-out person keeps working.
+
+## /userinfo re-checks tool access on every call
+
+`Enjab Auth` · 6 Jun 2026
+
+**Changed.** `/userinfo` re-checks that the user still has access to your tool, not just that the account exists. A revoked role or grant returns `401` immediately, the token alone is never enough.
+
+**Apply.** Read the user fresh on each request and treat a `401` as signed-out (redirect to `/authorize`). Do not trust a cached user or cookie claims.
+
+## Confirmed, per-tool sign-out
+
+`Enjab Auth` · 6 Jun 2026
+
+**Changed.** Sign-out is per-tool and confirmed on Enjab Auth. Your "Sign out" button navigates to `/api/auth/logout`, which sends the user to Enjab Auth's confirm page; confirming clears only your tool's session, never the central session.
+
+**Apply.** Use the logout route from the [Next.js reference](/docs/sign-in-with-enjab/nextjs). Never call a sign-out or clear the session yourself.
+
+## Roles are sent only to role-aware tools
+
+`Enjab Auth` · 6 Jun 2026
+
+**Changed.** `roles` and `is_super_admin` are included in the user object only if an admin marks your tool role-aware; otherwise the keys are absent.
+
+**Apply.** Treat access as binary. Do not gate features by role unless your tool is role-aware. See [Roles](/docs/sign-in-with-enjab/roles).
+
+## User name plus greeting and consent screen
+
+`Enjab Auth` · 6 Jun 2026
+
+**Changed.** The user object includes the person's `name` (set in Enjab Auth admin). Enjab Auth shows a greeting and consent screen on the way in.
+
+**Apply.** Greet the user with `user.name`. Do not build a consent screen; Enjab Auth owns it.
+
+## Drop-in dashboard shell wired to Enjab Auth
+
+`Enjab Auth` · 6 Jun 2026
+
+**Changed.** The reference now includes a complete dashboard shell: the Enjab UI sidebar wired to the signed-in user (real name, email, sign out, byline).
+
+**Apply.** Build your dashboard from the shell. See [Dashboard shell](/docs/sign-in-with-enjab/dashboard).
+
+## Redirects restricted to enjab.ae
+
+`Enjab Auth` · 6 Jun 2026
+
+**Changed.** Enjab Auth refuses to send a code to any `redirect_uri` that is not https on a registered `enjab.ae` domain. This is what stops a random site from harvesting a login.
+
+**Apply.** Host your tool on an `enjab.ae` domain and register the exact redirect URI in admin.
+
+## Sign in with Enjab Auth published (OAuth2 + RBAC)
+
+`Enjab Auth` · 6 Jun 2026
+
+**Changed.** Initial release: OAuth 2.0 authorization-code flow, the token response returns the user profile, `/userinfo` for fresh reads, and org-level role-based access control.
+
+**Apply.** Integrate per [Sign in with Enjab Auth](/docs/sign-in-with-enjab).

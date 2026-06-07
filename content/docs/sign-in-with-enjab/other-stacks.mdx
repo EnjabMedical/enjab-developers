@@ -36,8 +36,7 @@ Implement the same three OAuth calls with any stack:
        "email": "sara@enjab.ae",
        "name": "Sara Ahmed",
        "roles": ["reception"],
-       "is_super_admin": false,
-       "is_active": true
+       "is_super_admin": false
      }
    }
    ```
@@ -58,7 +57,7 @@ The browser should never see this token. On each subsequent request, read it fro
 The `ENJAB_CLIENT_SECRET` must never be shipped to the browser. If it appears in client-side code or reaches the browser, rotate it immediately from the tool's page in Enjab Auth admin.
 </Callout>
 
-- **Redirect URI must be HTTPS on enjab.ae** and registered in Enjab Auth admin. Enjab refuses to send authorization codes to any other domain; this is what stops an attacker from harvesting logins.
+- **Redirect URI must be HTTPS on enjab.ae** and registered in Enjab Auth admin. Enjab Auth refuses to send authorization codes to any other domain; this is what stops an attacker from harvesting logins.
 
 - **Store the access token in an httpOnly + secure + sameSite cookie.** Do not expose it to JavaScript. Set it with:
   ```
@@ -70,4 +69,4 @@ The `ENJAB_CLIENT_SECRET` must never be shipped to the browser. If it appears in
 
 - **Always derive the user from getUser()/userinfo.** Trust the `sub` field as the user's stable identity. Never trust user info that comes from the browser or your client code. Call `/api/oauth/userinfo` fresh on each request to catch sign-outs, role changes, and account disables immediately.
 
-- **Never cache the user object beyond the request.** A cached user object means revoked roles, disabled accounts, and central sign-outs will not reach your tool. Enjab cannot modify your cookie, so if you cache, a signed-out or disabled person keeps working.
+- **Never cache the user object beyond the request.** A cached user object means revoked roles, disabled accounts, and central sign-outs will not reach your tool. Enjab Auth cannot modify your cookie, so if you cache, a signed-out or disabled person keeps working.

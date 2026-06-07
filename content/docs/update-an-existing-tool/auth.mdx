@@ -4,7 +4,11 @@ description: "Re-validate an existing auth integration against the current Enjab
 icon: KeyRound
 ---
 
-When you update your integration, or Enjab Auth releases a new version, verify your tool against the current contract at https://developers.enjab.ae/llms.txt. This page covers the key points to re-check.
+When Enjab Auth changes, the [Enjab Auth changelog](/docs/changelog/enjab-auth) lists exactly what changed and the action to adopt it. Apply the entries your tool has not adopted yet, then verify against the [Sign in with Enjab Auth](/docs/sign-in-with-enjab) reference. This page covers the points most worth re-checking.
+
+<Callout title="Latest change">
+The `is_active` field was removed from the user object (Enjab Auth blocks disabled accounts at the door, so a tool only ever sees active users). Delete `is_active` from your `EnjabUser` type and any code that read it. See the [changelog](/docs/changelog/enjab-auth) for the full history.
+</Callout>
 
 ## Re-validate every request
 
@@ -13,7 +17,7 @@ This is critical and often the first thing to get wrong when updating.
 <Callout type="warn" title="Cache invalidation leak">
 On each request, call `getUser()` fresh. This must call `/userinfo` with `cache: "no-store"`. Never cache the user object beyond the request, or trust your cookie's claims.
 
-A signed-out user, a disabled user, or a user whose role changed at Enjab will keep working in your tool if you cache them. Enjab cannot touch your cookie. The only way central sign-out, account disable, and role changes reach you is if you call `/userinfo` every request.
+A signed-out user, a disabled user, or a user whose role changed at Enjab Auth will keep working in your tool if you cache them. Enjab Auth cannot touch your cookie. The only way central sign-out, account disable, and role changes reach you is if you call `/userinfo` every request.
 
 Always use the reference implementation exactly as written.
 </Callout>
@@ -45,7 +49,7 @@ export default async function Page() {
 
 ## No login UI of your own
 
-Your tool must not have a login button or login page. The moment a signed-out user touches any page, redirect straight to Enjab's `/authorize` endpoint. Enjab handles passwords, two-factor, and the greeting screen.
+Your tool must not have a login button or login page. The moment a signed-out user touches any page, redirect straight to Enjab Auth's `/authorize` endpoint. Enjab Auth handles passwords, two-factor, and the greeting screen.
 
 Use the middleware proxy from the reference to redirect instantly:
 
@@ -70,7 +74,7 @@ export const config = {
 
 ## Sign-out flow
 
-Your tool does not clear the session or call any sign-out method. A "Sign out" button navigates to your `/api/auth/logout` route. Enjab shows a confirmation page first, so an accidental click never logs anyone out. On confirm, Enjab sends the user back to your logout route with `?confirmed=1`, and only then do you clear your tool's session.
+Your tool does not clear the session or call any sign-out method. A "Sign out" button navigates to your `/api/auth/logout` route. Enjab Auth shows a confirmation page first, so an accidental click never logs anyone out. On confirm, Enjab Auth sends the user back to your logout route with `?confirmed=1`, and only then do you clear your tool's session.
 
 ```ts title="app/api/auth/logout/route.ts"
 export async function GET(req: NextRequest) {
@@ -93,7 +97,7 @@ Wire your sign-out button to `/api/auth/logout`:
 
 ## Role gating (only if role-aware)
 
-By default, Enjab does not send roles. Access is binary: if Enjab let the user in, they have access. Do not gate by role unless your tool is explicitly marked "role-aware" by an Enjab admin.
+By default, Enjab Auth does not send roles. Access is binary: if Enjab Auth let the user in, they have access. Do not gate by role unless your tool is explicitly marked "role-aware" by an Enjab Auth admin.
 
 If your tool is role-aware, you will receive a `roles` array in the user object. Gate internal features like this:
 
