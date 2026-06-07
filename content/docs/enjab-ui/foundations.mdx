@@ -69,6 +69,19 @@ const { pending } = useFormStatus();
 
 Never leave a button clickable and silent during a slow action.
 
+A button must **never change size** on hover, focus, or active/selected state, that shifts the
+layout around it. Change only color or background between states, never the box. The common
+trap: a state toggles a `border` on or off on an auto-width button, which makes it 1px wider
+or narrower per side. Keep a border in every state, using `border border-transparent` where
+you don't want a visible one:
+
+```tsx
+// selected vs not, same size (the selected state keeps a transparent border)
+className={active ? "border border-transparent bg-teal-tint text-teal" : "border text-muted-foreground"}
+```
+
+Do not change padding, border-width, or use `scale` on hover/active either.
+
 ## Motion & Animation
 
 Animations belong on landing and marketing pages only, implemented with Framer Motion. Dashboards and internal tools stay still (instant color and state changes only) for usability.

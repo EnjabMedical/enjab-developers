@@ -8,6 +8,14 @@ Changes to the [Enjab UI](/docs/enjab-ui) design system, newest first. To bring 
 to date, see [Update an existing tool](/docs/update-an-existing-tool/ui) or use the
 combined update prompt on the [Changelog overview](/docs/changelog).
 
+## 2026.06.07e: Buttons must not change size on hover or click
+
+`Enjab UI` · 7 Jun 2026
+
+**Changed.** New rule: a button must never change size on hover, focus, or active/selected state (no layout shift). Change only color or background. The usual cause is a border toggling on/off on an auto-width button; keep a border in every state (`border border-transparent` where you don't want a visible one). See [Foundations](/docs/enjab-ui/foundations).
+
+**Apply.** Audit selected/active button states for border, padding, or scale changes that resize the box.
+
 ## 2026.06.07d: Small screens must have full functionality
 
 `Enjab UI` · 7 Jun 2026
