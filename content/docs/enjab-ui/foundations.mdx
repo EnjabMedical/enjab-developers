@@ -109,6 +109,26 @@ The sidebar brand header and topbar share the same height (`h-15`) and bottom bo
 
 Every dashboard shows the "an Enjab product" byline: sidebar dashboards use `@enjab-ui/sidebar-footer` pinned to the bottom; no-sidebar dashboards place `@enjab-ui/enjab-byline` anywhere sensible. Never restyle these, fixed sizes keep all dashboards identical.
 
+## Browser tab titles
+
+Every browser tab title reads `Page - Service`, never the bare service name (for example
+`Sign in - Enjab Auth`, not just `Enjab Auth`). Set a title template once in the root
+layout, then give each page its own short title:
+
+```tsx title="app/layout.tsx"
+export const metadata = {
+  title: { default: "Your Tool", template: "%s - Your Tool" },
+};
+```
+
+```tsx title="app/settings/page.tsx"
+export const metadata = { title: "Settings" }; // tab reads: Settings - Your Tool
+```
+
+The home page falls back to the bare service name (the `default`); every other page sets a
+title. A client component page (`"use client"`) can't export `metadata`, so give it a tiny
+server `layout.tsx` that does.
+
 ## Language & Direction
 
 English, left to right.

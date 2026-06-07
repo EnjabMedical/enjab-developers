@@ -8,6 +8,14 @@ Changes to the [Enjab UI](/docs/enjab-ui) design system, newest first. To bring 
 to date, see [Update an existing tool](/docs/update-an-existing-tool/ui) or use the
 combined update prompt on the [Changelog overview](/docs/changelog).
 
+## 2026.06.07a: Browser tab titles read "Page - Service"
+
+`Enjab UI` · 7 Jun 2026
+
+**Changed.** New rule: every browser tab title reads `Page - Service` (for example `Sign in - Enjab Auth`), never the bare service name. Set a title template in the root layout (`title: { default, template: "%s - Service" }`) and give each page its own short title; client pages use a tiny server `layout.tsx`. See [Foundations](/docs/enjab-ui/foundations).
+
+**Apply.** Add the title template to your root layout and a `title` to each page. The home page can keep the bare service name.
+
 ## 2026.06.06l: Dashboards are responsive (phone-usable)
 
 `Enjab UI` · 6 Jun 2026
