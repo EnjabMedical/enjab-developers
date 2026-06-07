@@ -6,6 +6,23 @@ icon: KeyRound
 
 When Enjab Auth changes, the [Enjab Auth changelog](/docs/changelog/enjab-auth) lists exactly what changed and the action to adopt it. Apply the entries your tool has not adopted yet, then verify against the [Sign in with Enjab Auth](/docs/sign-in-with-enjab) reference. This page covers the points most worth re-checking.
 
+## The update prompt
+
+Hand an agent this message:
+
+```
+Update this project's "Sign in with Enjab" integration to the current Enjab Auth contract.
+Read https://developers.enjab.ae/llms.txt and the Enjab Auth changelog at
+https://developers.enjab.ae/docs/changelog/enjab-auth, then apply ONLY the changelog items
+this project has not adopted yet. These are integration changes (the EnjabUser type, the
+/api/auth/callback and /api/auth/logout routes, the proxy/middleware, and how getUser()
+calls /userinfo), not component installs, so edit the affected files to match the reference
+in the guide. Keep getUser() calling /userinfo fresh with `cache: "no-store"` and never
+cache the user. Do not refactor or restyle anything else, keep the change surface minimal.
+```
+
+The agent will fetch the docs and the changelog, check your integration against the latest entries, and apply only what you have not already adopted.
+
 <Callout title="Latest change">
 The `is_active` field was removed from the user object (Enjab Auth blocks disabled accounts at the door, so a tool only ever sees active users). Delete `is_active` from your `EnjabUser` type and any code that read it. See the [changelog](/docs/changelog/enjab-auth) for the full history.
 </Callout>
