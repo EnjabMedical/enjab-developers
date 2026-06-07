@@ -129,6 +129,17 @@ The home page falls back to the bare service name (the `default`); every other p
 title. A client component page (`"use client"`) can't export `metadata`, so give it a tiny
 server `layout.tsx` that does.
 
+## 404 page
+
+Every Enjab tool ships a custom `app/not-found.tsx`, never the framework default. Keep the
+same shape so all tools' 404s look alike: the tool's gradient mark, a `404` label, a
+**Page not found** heading, a short line, a button back home, and the "an Enjab product"
+byline. Install the ready one and edit its glyph + home link:
+
+```bash
+npx shadcn add @enjab-ui/not-found
+```
+
 ## Language & Direction
 
 English, left to right.
