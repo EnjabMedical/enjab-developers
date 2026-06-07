@@ -9,6 +9,14 @@ contract version is `2026.06.07a`. To bring a tool up to date, see
 [Update an existing tool](/docs/update-an-existing-tool/auth) or use the combined update
 prompt on the [Changelog overview](/docs/changelog).
 
+## Super admin can change a user's email
+
+`Enjab Auth` · 7 Jun 2026
+
+**Changed.** A super admin can change any user's email (including their own) from the Enjab Auth admin. The stable user id (`sub`) never changes, so nothing keyed by `sub` breaks. Regular users cannot change their own email.
+
+**Apply.** Key your own records by `sub`, never by email. Mirror the email from `/userinfo` on every request (the same place you read `name`), so an admin email change reflects in your tool immediately.
+
 ## Stronger accounts: password policy, forced first change, one super admin
 
 `Enjab Auth` · 7 Jun 2026
