@@ -124,6 +124,35 @@ The sidebar brand header and topbar share the same height (`h-15`) and bottom bo
 
 Every dashboard shows the "an Enjab product" byline: sidebar dashboards use `@enjab-ui/sidebar-footer` pinned to the bottom; no-sidebar dashboards place `@enjab-ui/enjab-byline` anywhere sensible. Never restyle these, fixed sizes keep all dashboards identical.
 
+## Tables (sortable by default)
+
+Build every table from `@enjab-ui/data-table`, never hand-roll one. Tables are **sortable by
+default**: every column that holds data must be sortable by clicking its header. Clicking
+toggles ascending, then descending, then back to the original order, and an arrow shows the
+active column and direction (up for ascending, down for descending, a faint neutral arrow on
+the others). Sorting handles every data type: text (alphabetical, locale and numeric aware so
+`Item 2` comes before `Item 10`), numbers, dates, and addition time (the unsorted state is the
+original insertion order, so "as added" is always reachable).
+
+Give a column a `sortValue` to make it sortable; the cell can still render anything (an avatar,
+a status pill, a link), because sorting uses the raw `sortValue`, not the rendered markup.
+Blank values always sort to the bottom regardless of direction, and the sort is stable (equal
+rows keep their original order). Leave `sortValue` off only for columns with nothing to sort,
+such as a trailing actions column.
+
+```tsx
+const columns: Column<Patient>[] = [
+  { header: "Name", sortValue: (p) => p.name, cell: (p) => <PatientCell patient={p} /> },
+  { header: "Visits", sortType: "number", sortValue: (p) => p.visits, cell: (p) => p.visits },
+  { header: "Added", sortType: "date", sortValue: (p) => p.createdAt, cell: (p) => fmt(p.createdAt) },
+  { header: "", cell: (p) => <RowActions id={p.id} /> }, // no sortValue: not sortable
+];
+```
+
+`DataTable` is a client component (sorting is interactive). In a Server Component page, fetch
+the rows on the server and pass them to a small `"use client"` table component that defines the
+columns, rather than passing column render functions across the server/client boundary.
+
 ## Browser tab titles
 
 Every browser tab title reads `Page - Service`, never the bare service name (for example

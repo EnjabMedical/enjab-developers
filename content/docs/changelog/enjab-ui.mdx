@@ -8,6 +8,14 @@ Changes to the [Enjab UI](/docs/enjab-ui) design system, newest first. To bring 
 to date, see [Update an existing tool](/docs/update-an-existing-tool/ui) or use the
 combined update prompt on the [Changelog overview](/docs/changelog).
 
+## 2026.06.08a: Tables are sortable by default
+
+`Enjab UI` · 8 Jun 2026
+
+**Changed.** `@enjab-ui/data-table` now sorts. Every data column is sortable by clicking its header: ascending, then descending, then back to the original (addition) order, with an arrow marking the active column and direction. Handles text (locale + numeric aware), numbers, dates, and addition time; blanks sort last; the sort is stable. New rule: every table column that holds data must be sortable (give it a `sortValue`); leave it off only for an actions column. See [Foundations](/docs/enjab-ui/foundations).
+
+**Apply.** Re-install: `npx shadcn add @enjab-ui/data-table`. Add a `sortValue` to each data column. `DataTable` is now a client component, so in a Server Component page pass server-fetched rows to a small `"use client"` table component that defines the columns.
+
 ## 2026.06.07e: Buttons must not change size on hover or click
 
 `Enjab UI` · 7 Jun 2026
