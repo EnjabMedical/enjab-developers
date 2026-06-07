@@ -1,45 +1,21 @@
 ---
 title: Overview
-description: The central changelog for the Enjab platform. What changed in Enjab UI and Enjab Auth, and one prompt to update a tool against both.
+description: The central changelog for the Enjab platform. What changed in Enjab UI and Enjab Auth, newest first.
 icon: ScrollText
 ---
 
 The single, central changelog for the Enjab platform. Each entry says what changed and the
-exact action to adopt it. Pick the area you depend on, or use the one prompt below to bring
-a tool up to date on everything at once.
+exact action to adopt it. Pick the area you depend on below.
 
 <Cards>
   <Card title="Enjab UI" href="/docs/changelog/enjab-ui" description="Design system changes: components, theme tokens, and rules." />
   <Card title="Enjab Auth" href="/docs/changelog/enjab-auth" description="Integration-contract changes for Sign in with Enjab Auth." />
 </Cards>
 
-## Update everything, one prompt
+## Updating a tool
 
-Hand this to a coding agent to bring a tool up to date on both Enjab UI and Enjab Auth. It
-reads the central docs, works out what the project has not adopted, and applies only that.
-
-<Callout title="Update everything (UI + Auth)">
-```text
-Update this project to the latest Enjab standards (UI and Auth). Read
-https://developers.enjab.ae/llms.txt and the changelog at
-https://developers.enjab.ae/docs/changelog (both the Enjab UI and the Enjab Auth pages),
-then apply ONLY the changelog entries this project has not adopted yet.
-
-For Enjab UI: re-install changed components with `npx shadcn add @enjab-ui/<name>`
-(overwrite) and re-apply the theme with `npx shadcn add https://ui.enjab.ae/r/theme.json`
-if tokens changed.
-
-For Enjab Auth: re-sync the drop-in reference files (lib/enjab-auth.ts, the callback and
-logout routes, proxy.ts) and re-check the integration rules (re-validate every request via
-/userinfo with cache: "no-store", no login UI of your own, confirmed per-tool sign-out,
-access is binary unless the tool is role-aware).
-
-Do not refactor or restyle anything else. Keep the change surface minimal.
-```
-</Callout>
-
-<Callout type="info" title="Minimal surface">
-Updates are not refactors. Apply only the entries the project has not adopted, and leave
-the rest of the codebase exactly as it is. For a focused update of one area, see
-[Update an existing tool](/docs/update-an-existing-tool).
-</Callout>
+To bring a tool up to date, see [Update an existing tool](/docs/update-an-existing-tool): one
+prompt for [everything (UI + Auth)](/docs/update-an-existing-tool), or a focused
+[UI](/docs/update-an-existing-tool/ui) or [Auth](/docs/update-an-existing-tool/auth) track.
+Updates are not refactors, apply only what a tool has not adopted and leave the rest exactly
+as it is.

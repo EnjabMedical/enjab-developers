@@ -21,11 +21,31 @@ Do not restyle or reorganize surrounding code.
   <Card title="Update the auth integration" href="/docs/update-an-existing-tool/auth" description="Re-sync the drop-in reference files and re-check the integration rules, per the Enjab Auth changelog." />
 </Cards>
 
-## Update everything at once
+## Update everything, one prompt
 
-To bring a tool up to date on both UI and Auth in one go, use the single
-[update-everything prompt](/docs/changelog) on the changelog overview. It reads the central
-docs and both changelogs, works out what your project is missing, and applies only that.
+Hand this to a coding agent to bring a tool up to date on both Enjab UI and Enjab Auth in one
+go. It reads the central docs, works out what the project has not adopted, and applies only
+that. For a focused update of just one area, use the two tracks above.
+
+<Callout title="Update everything (UI + Auth)">
+```text
+Update this project to the latest Enjab standards (UI and Auth). Read
+https://developers.enjab.ae/llms.txt and the changelog at
+https://developers.enjab.ae/docs/changelog (both the Enjab UI and the Enjab Auth pages),
+then apply ONLY the changelog entries this project has not adopted yet.
+
+For Enjab UI: re-install changed components with `npx shadcn add @enjab-ui/<name>`
+(overwrite) and re-apply the theme with `npx shadcn add https://ui.enjab.ae/r/theme.json`
+if tokens changed.
+
+For Enjab Auth: re-sync the drop-in reference files (lib/enjab-auth.ts, the callback and
+logout routes, proxy.ts) and re-check the integration rules (re-validate every request via
+/userinfo with cache: "no-store", no login UI of your own, confirmed per-tool sign-out,
+access is binary unless the tool is role-aware).
+
+Do not refactor or restyle anything else. Keep the change surface minimal.
+```
+</Callout>
 
 ## Live contract
 
