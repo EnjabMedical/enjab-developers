@@ -137,3 +137,36 @@ Authorization: Bearer <access_token>
 
 **Response:**
 The fresh `user` object (same shape as the token response above).
+
+---
+
+### GET /api/oauth/users
+
+Server-to-server only. The directory of users who can access your tool: everyone an admin gave access (via a role or a direct grant), with their name, email, roles, and `is_super_admin`. Some tools need to preview or pick from their users; this is the read-only roster. **Never returns passwords.**
+
+Returned ONLY if an Enjab admin enabled **User directory** for your tool (Admin → Tools → your tool → User directory). Otherwise it answers `403`. The roster is scoped to your tool's own accessible users, never the whole organization, and reflects live access on every call (a revoked user drops off immediately).
+
+Authenticate with HTTP Basic: your `client_id` as the username, your `client_secret` as the password (the OAuth `client_secret_basic` method). Same server-only secret as the token endpoint, never expose it to the browser.
+
+```bash title="Example: GET /api/oauth/users"
+curl https://auth.enjab.ae/api/oauth/users \
+  -u "<client-id>:<client-secret>"
+```
+
+**Response:**
+```json
+{
+  "users": [
+    {
+      "sub": "0f3c...",
+      "email": "sara@enjab.ae",
+      "name": "Sara Ahmed",
+      "roles": ["reception"],
+      "is_super_admin": false,
+      "created_at": "2026-06-05T21:35:01.683Z"
+    }
+  ]
+}
+```
+
+Unlike `/userinfo`, the directory always includes `roles` and `is_super_admin` (it exists to list people with their roles). Key your own records by each user's `sub`.

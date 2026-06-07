@@ -49,6 +49,12 @@ Access is binary. An admin gives a user access to your tool (via a role or a dir
 
 Turn on roles ONLY when your tool has functions that not every authorized user should reach (for example, an admin-only settings page inside the tool). Then an Enjab Auth admin flips your tool to "role-aware" (Admin -> Tools -> your tool -> Role-aware), and from then on the `user` object includes `roles` (global keys like `reception`, `doctor`). You gate with `user.roles?.includes("reception")`. If the flag is off, `roles` is omitted.
 
+## Reading your tool's users (directory)
+
+By default a tool only ever learns about the person currently signed in. Some tools need the whole roster, the people who can use the tool, to preview or assign them (for example, an HR tool listing staff, or picking an approver). For that, an Enjab Auth admin enables **User directory** for your tool (Admin -> Tools -> your tool -> User directory).
+
+Once enabled, your server can call `GET /api/oauth/users` (authenticated with your `client_id` + `client_secret`) to read everyone who can access your tool, with their name, email, roles, and `is_super_admin`. It **never** returns passwords, and it is scoped to your tool's own accessible users, not the whole organization. See the [endpoint reference](/docs/sign-in-with-enjab/flow#get-apioauthusers). This is read-only: managing who has access stays in Enjab Auth admin.
+
 <Cards>
   <Card
     title="Register your tool"

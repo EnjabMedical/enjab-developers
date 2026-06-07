@@ -5,9 +5,17 @@ icon: KeyRound
 ---
 
 Changes to [Sign in with Enjab Auth](/docs/sign-in-with-enjab), newest first. The current
-contract version is `2026.06.07a`. To bring a tool up to date, see
+contract version is `2026.06.08a`. To bring a tool up to date, see
 [Update an existing tool](/docs/update-an-existing-tool/auth) or use the combined update
 prompt on the [Changelog overview](/docs/changelog).
+
+## User directory: a tool can read its own users
+
+`Enjab Auth` · 8 Jun 2026
+
+**Changed.** New optional per-tool capability. When an Enjab admin enables **User directory** for a tool (Admin → Tools → your tool → User directory), the tool can read the roster of users who can access it via a new endpoint `GET /api/oauth/users`. It returns each user's `sub`, `email`, `name`, `roles`, `is_super_admin`, and `created_at`, scoped to the tool's own accessible users, and **never** passwords. Authenticate server-to-server with HTTP Basic (`client_id` + `client_secret`). Off by default; tools that don't need the roster are unaffected.
+
+**Apply.** Only if your tool needs to list or preview its users. Ask an admin to enable User directory, then call `GET /api/oauth/users` from your server with your client credentials (see the [Next.js reference](/docs/sign-in-with-enjab/nextjs) `getDirectory()` helper and the [endpoint reference](/docs/sign-in-with-enjab/flow#get-apioauthusers)). Keep the client secret server-only. Nothing to change if your tool doesn't use it.
 
 ## Super admin can change a user's email
 
