@@ -1,2 +1,2 @@
 { "title": "Changelog", "icon": "ScrollText",
-  "pages": ["index", "enjab-ui", "enjab-auth"] }
+  "pages": ["index", "enjab-ui", "enjab-auth", "standards"] }

@@ -10,7 +10,9 @@ export function GET() {
 
   const header = `# Enjab Developers
 
-> Documentation for building on Enjab, for humans and coding agents. Every page below is
+> Documentation for building on Enjab, for humans and coding agents. Built on three
+> backbones: Sign in with Enjab Auth (identity), Enjab UI (design system), and the
+> Engineering Standards (infrastructure rules and general guidelines). Every page below is
 > also raw-fetchable markdown: fetch /llms.mdx/docs/<path>/content.md for a single page's
 > source, or /llms-full.txt for every page concatenated into one document.
 

@@ -1,0 +1,23 @@
+---
+title: "Update to the standards"
+description: "Bring an existing tool in line with the latest Enjab Engineering Standards."
+icon: ServerCog
+---
+
+When the [Engineering Standards](/docs/standards) change, the [Engineering Standards changelog](/docs/changelog/standards) lists exactly what changed and the action to adopt it. Apply the entries your tool has not adopted yet. Unlike UI components or the auth integration, these are infrastructure and process rules (security, deployment, pipeline, and the like), so adopting them means adjusting config, CI/CD, and code, not installing a package.
+
+## The update prompt
+
+Hand an agent this message:
+
+```
+Update this project to the latest Enjab Engineering Standards. Read
+https://developers.enjab.ae/llms.txt and the Engineering Standards changelog at
+https://developers.enjab.ae/docs/changelog/standards, then apply ONLY the standards this
+project has not adopted yet. These are infrastructure and process rules (security,
+deployment, pipeline, and the like), not components or integration files, so adjust the
+project's config, CI/CD, and code to match each standard. Do not refactor or restyle
+anything else, keep the change surface minimal.
+```
+
+The agent will fetch the docs and the changelog, check your project against the latest standards, and apply only what you have not already adopted.

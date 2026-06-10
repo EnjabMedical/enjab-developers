@@ -4,12 +4,15 @@ description: How the Enjab tools fit together and the fastest path to a working 
 icon: Rocket
 ---
 
-An **Enjab tool** is a web app that two Enjab services take care of for you:
+An **Enjab tool** is a web app built on three Enjab backbones:
 
 - **[Sign in with Enjab Auth](/docs/sign-in-with-enjab)** handles _who the user is_ and
   _whether they may use your tool_. You never build a login screen or touch a password.
 - **[Enjab UI](/docs/enjab-ui)** gives you the _look_ - a themed component registry and a
   dashboard shell, so every Enjab tool feels like one product.
+- **[Engineering Standards](/docs/standards)** are the _rules_ - infrastructure and process
+  guidelines (security, deployment, pipeline) so every tool ships production-ready and
+  consistent.
 
 You build the part in the middle: your tool's actual features. Everything else is
 provided.
