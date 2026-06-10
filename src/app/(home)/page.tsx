@@ -41,13 +41,13 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-5xl px-6 pt-20 pb-12 text-center">
         <span
           className="mx-auto flex size-16 items-center justify-center rounded-[25%] text-white"
-          style={{ background: 'linear-gradient(135deg, #057C8B 0%, #1B3766 100%)' }}
+          style={{ background: 'linear-gradient(135deg, var(--color-teal) 0%, var(--color-navy) 100%)' }}
         >
           <Terminal className="size-8" strokeWidth={2} />
         </span>
         <h1
           className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl"
-          style={{ color: '#1B3766' }}
+          style={{ color: 'var(--color-navy)' }}
         >
           Build with Enjab
         </h1>
@@ -81,7 +81,7 @@ export default function HomePage() {
             <span className="flex size-10 items-center justify-center rounded-lg bg-fd-accent text-fd-primary">
               <Icon className="size-5" />
             </span>
-            <h2 className="mt-4 flex items-center gap-1.5 text-lg font-semibold" style={{ color: '#1B3766' }}>
+            <h2 className="mt-4 flex items-center gap-1.5 text-lg font-semibold" style={{ color: 'var(--color-navy)' }}>
               {title}
               <ArrowRight className="size-4 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
             </h2>

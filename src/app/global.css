@@ -23,6 +23,8 @@
   --color-fd-popover-foreground: #0d0d0d;
 
   /* brand */
+  --color-teal: #057c8b;
+  --color-navy: #1b3766;
   --color-fd-primary: #057c8b; /* teal */
   --color-fd-primary-foreground: #ffffff;
   --color-fd-secondary: #edf1f2;

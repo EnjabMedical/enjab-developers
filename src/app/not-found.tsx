@@ -9,12 +9,12 @@ export default function NotFound() {
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-24 text-center">
       <span
         className="flex size-14 items-center justify-center rounded-[25%] text-white"
-        style={{ background: "linear-gradient(135deg, #057C8B 0%, #1B3766 100%)" }}
+        style={{ background: "linear-gradient(135deg, var(--color-teal) 0%, var(--color-navy) 100%)" }}
       >
         <TerminalGlyph className="size-7" />
       </span>
       <p className="mt-6 font-mono text-sm uppercase tracking-[0.2em] text-fd-muted-foreground">404</p>
-      <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "#1B3766" }}>
+      <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "var(--color-navy)" }}>
         Page not found
       </h1>
       <p className="mt-2 max-w-sm text-fd-muted-foreground">

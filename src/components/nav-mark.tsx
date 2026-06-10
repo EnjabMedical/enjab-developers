@@ -10,11 +10,11 @@ export function NavMark() {
     <span className="flex items-center gap-2.5">
       <span
         className="flex size-7 shrink-0 items-center justify-center rounded-[25%] text-white"
-        style={{ background: 'linear-gradient(135deg, #057C8B 0%, #1B3766 100%)' }}
+        style={{ background: 'linear-gradient(135deg, var(--color-teal) 0%, var(--color-navy) 100%)' }}
       >
         <TerminalGlyph className="size-[55%]" />
       </span>
-      <span className="font-semibold tracking-tight" style={{ color: '#1B3766' }}>
+      <span className="font-semibold tracking-tight" style={{ color: 'var(--color-navy)' }}>
         Enjab Developers
       </span>
     </span>
