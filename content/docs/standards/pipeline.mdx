@@ -1,9 +1,25 @@
 ---
 title: Pipeline
-description: CI/CD pipeline standards for Enjab tools.
+description: Source control and continuous deployment for Enjab tools.
 icon: GitBranch
 ---
 
-<Callout title="Draft">
-Placeholder. The pipeline (CI/CD) standards will be written here.
-</Callout>
+How code gets from a developer's machine to production. These rules are mandatory.
+
+## Source of truth: the Enjab GitHub org
+
+Every Enjab project lives in the **Enjab GitHub organization** (the `ceo@enjab.ae` account /
+EnjabMedical), never on an individual's personal GitHub. Org-owned code does not walk out the
+door when a person does: access is centrally controlled, the history and ownership survive any
+one contributor, and offboarding happens in one place. A production repo sitting on a personal
+account is a single point of failure and a governance risk.
+
+## Deploy from Git, never by hand
+
+Connect the Vercel project to its GitHub repo and let Vercel **deploy automatically on push**:
+production from the `main` branch, preview deployments for every other branch and pull request.
+Never run a manual deploy (`vercel deploy` / `vercel --prod`) from a laptop.
+
+Every production deploy then maps to a specific commit: it is traceable, reproducible, and
+reviewable, a rollback is just an earlier commit, and there is no "it worked on my machine"
+deploy that nobody else can reproduce.

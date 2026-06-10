@@ -4,11 +4,34 @@ description: Version history for the Enjab Engineering Standards. Each entry say
 icon: ServerCog
 ---
 
-Changes to the [Engineering Standards](/docs/standards), newest first. To bring a tool up to
-date, see [Update an existing tool](/docs/update-an-existing-tool/standards) or use the
-combined update prompt on the [Update overview](/docs/update-an-existing-tool).
+Changes to the [Engineering Standards](/docs/standards), newest first. The current standards
+version is `2026.06.08b`. To bring a tool up to date, see
+[Update an existing tool](/docs/update-an-existing-tool/standards) or use the combined update
+prompt on the [Update overview](/docs/update-an-existing-tool).
 
-<Callout title="No entries yet">
-The standards are being written. Each one published (security, deployment, pipeline, and
-more) will appear here with the exact action to adopt it.
-</Callout>
+## 2026.06.08b: Deploy from Git, on the Enjab GitHub org
+
+`Engineering Standards` · 8 Jun 2026
+
+**Changed.** New pipeline rules. Every Enjab project lives in the Enjab GitHub org (the
+`ceo@enjab.ae` / EnjabMedical account), never a personal account. Deployment is Git-based:
+connect Vercel to the repo and let it deploy automatically on push (production from `main`,
+previews for everything else), never a manual `vercel deploy` from a machine. See
+[Pipeline](/docs/standards/pipeline).
+
+**Apply.** Move any tool's repo into the Enjab org if it is not already there. In Vercel,
+connect the project to that GitHub repo, confirm auto-deploy on push, and drop any
+manual-deploy step from your workflow.
+
+## 2026.06.08a: Host on Vercel, or Cloudflare-fronted elsewhere
+
+`Engineering Standards` · 8 Jun 2026
+
+**Changed.** New deployment rules. Host on Vercel by default (TLS and the CDN are handled for
+you). If a tool must run on a VPS or your own server instead, put the domain behind Cloudflare
+with the orange cloud on (proxied) and let Cloudflare handle HTTPS (a Cloudflare Origin
+Certificate on the origin, SSL/TLS mode Full (strict), and Always Use HTTPS), so you never
+chase certificates. See [Deployment](/docs/standards/deployment).
+
+**Apply.** Keep tools on Vercel where it makes sense. For anything self-hosted, turn on
+Cloudflare's orange cloud and move TLS to Cloudflare per the deployment standard.

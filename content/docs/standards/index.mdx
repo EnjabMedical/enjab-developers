@@ -4,20 +4,16 @@ description: Infrastructure rules and general engineering guidelines for buildin
 icon: ServerCog
 ---
 
-<Callout title="Draft section">
-This section is scaffolded but not written yet. The guidelines below are placeholders. We
-will fill them in together.
-</Callout>
-
 Infrastructure rules and general engineering guidelines, so every Enjab tool ships
-production-ready and consistent: security, deployment, pipelines, and more.
+production-ready and consistent: security, deployment, pipelines, and more. We publish these
+incrementally; each one lands here and in the [changelog](/docs/changelog/standards).
 
 Every standard published here is **mandatory** for every Enjab tool, a hard gate before
 production, not a suggestion. They are strict on purpose: they are what keeps a fleet of
 tools safe, reliable, and consistent to operate.
 
 <Cards>
-  <Card title="Security" href="/docs/standards/security" description="To be defined." />
-  <Card title="Deployment" href="/docs/standards/deployment" description="To be defined." />
-  <Card title="Pipeline" href="/docs/standards/pipeline" description="To be defined." />
+  <Card title="Security" href="/docs/standards/security" description="Coming soon." />
+  <Card title="Deployment" href="/docs/standards/deployment" description="Where and how tools are hosted and served: Vercel by default, Cloudflare-fronted with Cloudflare-handled HTTPS elsewhere." />
+  <Card title="Pipeline" href="/docs/standards/pipeline" description="Source control and CI/CD: repos in the Enjab GitHub org, Git-based auto-deploy on push." />
 </Cards>

@@ -1,9 +1,42 @@
 ---
 title: Deployment
-description: Deployment standards for shipping Enjab tools to production.
+description: Where and how every Enjab tool is hosted and served.
 icon: Rocket
 ---
 
-<Callout title="Draft">
-Placeholder. The deployment standards will be written here.
-</Callout>
+Where every Enjab tool runs and how it is served to users. These rules are mandatory.
+
+## Host on Vercel by default
+
+Always host on Vercel when it makes sense, which is almost always. It is free for our use,
+fast, and the platform the rest of the fleet runs on, so previews, rollbacks, and tooling stay
+consistent across every project. Reach for anything else only when a tool has a real
+requirement Vercel genuinely cannot meet.
+
+On Vercel, TLS and the CDN are handled for you: you never manage certificates, and the
+Cloudflare rules below do not apply.
+
+## Hosting elsewhere (a VPS or your own server)
+
+When a tool truly cannot run on Vercel and you host it on a VPS or your own server, two rules
+are non-negotiable.
+
+### Put the domain behind Cloudflare (orange cloud)
+
+Proxy the domain through Cloudflare with the **orange cloud on** (proxied), never grey-cloud /
+DNS-only. The orange cloud puts Cloudflare in front of your origin, so you get the CDN, DDoS
+protection, and a hidden origin IP for free, and it is what makes the HTTPS rule below work.
+
+### Let Cloudflare handle HTTPS
+
+Do not chase certificates on the origin. Let Cloudflare terminate TLS at the edge so you are
+never renewing a public certificate by hand:
+
+- Cloudflare's edge certificate (Universal SSL) is automatic and auto-renewed. Zero work.
+- On the origin, install a **Cloudflare Origin Certificate** (valid for years, no renewals)
+  and set the **SSL/TLS mode to Full (strict)**, so the hop from Cloudflare to your origin
+  stays encrypted and verified.
+- Turn on **Always Use HTTPS** so every request is upgraded.
+
+Set it once, then stop thinking about certificates. (Again: none of this applies on Vercel,
+which does TLS for you.)
