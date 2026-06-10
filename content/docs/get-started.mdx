@@ -1,6 +1,6 @@
 ---
 title: Get started
-description: How the Enjab tools fit together and the fastest path to a working tool - login plus on-brand UI.
+description: How the Enjab backbones fit together and the fastest path to a working tool - login, on-brand UI, and the engineering standards every tool must meet.
 icon: Rocket
 ---
 
@@ -26,6 +26,8 @@ provided.
 3. Once signed in, you key all your own data by the user's stable Enjab id (`sub`).
 4. Your dashboard uses the Enjab UI shell, so the sidebar, account block, and the
    "an Enjab product" byline are consistent with every other tool.
+5. It meets the **[Engineering Standards](/docs/standards)** before it ships: the security,
+   deployment, and pipeline rules every Enjab tool must follow.
 
 ## Fastest path
 
@@ -54,9 +56,24 @@ Install the Enjab UI chrome and theme, then build your screens with the registry
 components so your tool matches the rest of Enjab. See [Enjab UI](/docs/enjab-ui).
 </Step>
 
+<Step>
+### Meet the Engineering Standards
+
+Before it goes to production, bring your tool in line with the
+[Engineering Standards](/docs/standards): the security, deployment, and pipeline rules every
+Enjab tool must follow. These are not optional. A tool is not "done" until it meets them.
+</Step>
+
 </Steps>
+
+<Callout type="warn" title="The standards are mandatory">
+Login and UI make a tool _work_ and _look_ right. The Engineering Standards make it _safe to
+run in production_, and they are strict: they apply to every Enjab tool, no exceptions, and
+are a hard gate before shipping. Read them early, not after you are "done".
+</Callout>
 
 ## Handing this to an agent
 
 Give your coding agent this site's [`/llms.txt`](/llms.txt) (or the specific page's raw
-markdown) and the task. The pages are written so the agent can do each step end to end.
+markdown) and the task. The pages are written so the agent can do each step end to end,
+including meeting the [Engineering Standards](/docs/standards) before it ships.

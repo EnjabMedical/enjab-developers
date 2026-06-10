@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, KeyRound, Paintbrush, RefreshCw, Terminal } from 'lucide-react';
+import { ArrowRight, KeyRound, Paintbrush, RefreshCw, ServerCog, Terminal } from 'lucide-react';
 import { EnjabByline } from '@/components/enjab-byline';
 
 const cards = [
@@ -20,6 +20,12 @@ const cards = [
     icon: Paintbrush,
     title: 'Enjab UI',
     desc: 'The Enjab design system. Install themed components from the registry and ship on-brand fast.',
+  },
+  {
+    href: '/docs/standards',
+    icon: ServerCog,
+    title: 'Engineering Standards',
+    desc: 'Infrastructure rules and general guidelines (security, deployment, pipeline) every tool must meet.',
   },
   {
     href: '/docs/update-an-existing-tool',
