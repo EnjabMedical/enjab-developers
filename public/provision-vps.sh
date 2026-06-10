@@ -31,21 +31,68 @@ if [ "$SMAJ" -lt 8 ] 2>/dev/null || { [ "$SMAJ" -eq 8 ] 2>/dev/null && [ "$SMIN"
 fi
 
 # ---------- 1. SSH key (the server becomes key-only, so you MUST have one) ----------
+# Generate a new ed25519 key, with a custom name and an optional passphrase.
+gen_key() {
+  local name path pp
+  while :; do
+    printf 'Name for the new key (saved in ~/.ssh/): '; read -r name < /dev/tty || true
+    name="${name:-enjab_server}"
+    path="$HOME/.ssh/$name"
+    [ -e "$path" ] && { warn "$path already exists, choose another name."; continue; }
+    break
+  done
+  printf 'Protect it with a passphrase? [y/N] '; read -r pp < /dev/tty || true
+  mkdir -p "$HOME/.ssh"; chmod 700 "$HOME/.ssh"
+  case "${pp:-N}" in
+    [Yy]*) ssh-keygen -t ed25519 -f "$path" -C "enjab-$(whoami)" < /dev/tty ;;   # prompts for the passphrase
+    *)     ssh-keygen -t ed25519 -f "$path" -N "" -C "enjab-$(whoami)" ;;
+  esac
+  KEY_PRIV="$path"
+}
+
+# Gather every usable keypair in ~/.ssh (a *.pub with its matching private key).
+KEYS=()
+if [ -d "$HOME/.ssh" ]; then
+  for pub in "$HOME"/.ssh/*.pub; do
+    [ -e "$pub" ] || continue
+    priv="${pub%.pub}"
+    [ -f "$priv" ] && KEYS+=("$priv")
+  done
+fi
+
 KEY_PRIV=""
-for k in id_ed25519 id_ecdsa id_rsa; do
-  [ -f "$HOME/.ssh/$k.pub" ] && { KEY_PRIV="$HOME/.ssh/$k"; break; }
-done
-if [ -z "$KEY_PRIV" ]; then
-  warn "No SSH key found in ~/.ssh."
-  printf 'Generate a new ed25519 key now? [Y/n] '; read -r a < /dev/tty || true
+if [ "${#KEYS[@]}" -gt 0 ]; then
+  say "Choose the SSH key to install for the '$SERVER_USER' user (it becomes the only way in):"
+  n=0
+  for k in "${KEYS[@]}"; do
+    n=$((n + 1))
+    fp="$(ssh-keygen -lf "$k.pub" 2>/dev/null | awk '{print $4" "$2}')"
+    printf '  %s) %s  %s%s%s\n' "$n" "$(basename "$k")" "$D" "$fp" "$N"
+  done
+  printf '  n) generate a NEW key\n'
+  while :; do
+    printf 'Pick [1-%s, or n]: ' "$n"; read -r choice < /dev/tty || true
+    case "$choice" in
+      n|N) gen_key; break ;;
+      ''|*[!0-9]*) warn "Enter a number, or n to make a new key." ;;
+      *) if [ "$choice" -ge 1 ] && [ "$choice" -le "$n" ]; then KEY_PRIV="${KEYS[$((choice - 1))]}"; break; else warn "Out of range."; fi ;;
+    esac
+  done
+else
+  warn "No SSH keys found in ~/.ssh."
+  printf 'Generate a new one now? [Y/n] '; read -r a < /dev/tty || true
   case "${a:-Y}" in
     [Nn]*) die "An SSH key is required: the server is key-only after hardening." ;;
-    *) ssh-keygen -t ed25519 -f "$HOME/.ssh/id_ed25519" -N "" -C "enjab-$(whoami)@$(hostname -s 2>/dev/null || echo laptop)" ; KEY_PRIV="$HOME/.ssh/id_ed25519" ;;
+    *) gen_key ;;
   esac
 fi
+
+[ -n "$KEY_PRIV" ] && [ -f "$KEY_PRIV.pub" ] || die "No usable key selected."
+# Load it into the agent so a passphrase is asked at most once (harmless for keyless keys).
+ssh-add "$KEY_PRIV" >/dev/null 2>&1 || true
 PUBKEY="$(cat "$KEY_PRIV.pub")"
 PUBKEY_B64="$(printf '%s' "$PUBKEY" | base64 | tr -d '\n')"
-ok "Using key ${D}$KEY_PRIV.pub${N}"
+ok "Using key ${D}$(basename "$KEY_PRIV").pub${N}"
 
 # ---------- 2. prompts ----------
 printf 'New VPS IP address (the IPv4 you ssh to): '; read -r IP < /dev/tty
