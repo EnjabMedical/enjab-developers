@@ -5,9 +5,44 @@ icon: ServerCog
 ---
 
 Changes to the [Engineering Standards](/docs/standards), newest first. The current standards
-version is `2026.06.08c`. To bring a tool up to date, see
+version is `2026.06.08f`. To bring a tool up to date, see
 [Update an existing tool](/docs/update-an-existing-tool/standards) or use the combined update
 prompt on the [Update overview](/docs/update-an-existing-tool).
+
+## 2026.06.08f: Object storage on Cloudflare R2, never self-hosted
+
+`Engineering Standards` · 8 Jun 2026
+
+**Changed.** New storage rule. Files and objects go to Cloudflare R2 (preferred, always the
+Enjab `ceo [at] enjab [dot] ae` account, never personal) or, only when genuinely better, the
+VPS disk. Never self-host object storage (no MinIO/Ceph/homemade S3). See
+[Storage](/docs/standards/storage).
+
+**Apply.** Move any blob/file storage to the Enjab R2. Drop any self-hosted object store.
+
+## 2026.06.08e: Databases are always the Enjab Supabase
+
+`Engineering Standards` · 8 Jun 2026
+
+**Changed.** New database rules. Every database is Supabase (managed Postgres), always the
+Enjab account (`ceo [at] enjab [dot] ae`), never personal and never self-hosted on a VPS. Row
+Level Security is on by default (disable only when genuinely needed). RAG/vector search uses
+Supabase `pgvector`, not a separate vector DB. See [Databases](/docs/standards/databases).
+
+**Apply.** Confirm your DB is on the Enjab Supabase with RLS enabled where it makes sense.
+Move any self-hosted or personal DB onto it.
+
+## 2026.06.08d: VPS must be Hetzner Ubuntu, hardened before use
+
+`Engineering Standards` · 8 Jun 2026
+
+**Changed.** New server rules. A VPS must be a supported Ubuntu LTS (22.04/24.04/26.04), on
+Hetzner only, dual-stack (IPv4 + IPv6). You never ssh in as root and start: a one-command
+provisioner hardens it (key-only `server` sudo user with passwordless sudo, root + password
+SSH disabled, fail2ban, ufw, unattended security updates, Docker). See
+[Servers (VPS)](/docs/standards/servers).
+
+**Apply.** Provision every new box with `bash <(curl -fsSL https://developers.enjab.ae/provision-vps.sh)` before it runs anything. Retire boxes that are not Hetzner Ubuntu.
 
 ## 2026.06.08c: No raw emails on public pages
 

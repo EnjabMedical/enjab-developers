@@ -1,0 +1,54 @@
+---
+title: Servers (VPS)
+description: What a VPS must be, and how every new one is hardened before it does anything.
+icon: Server
+---
+
+When a tool needs a server of its own (not Vercel), these rules are mandatory. A box that
+does not meet them does not go into service.
+
+## What a VPS must be
+
+- **Ubuntu, a supported LTS only.** 22.04, 24.04, or 26.04. No Debian, no CentOS, no other
+  distro, no end-of-life Ubuntu. One OS family, so every box is the same to operate and
+  patch.
+- **Hetzner only.** No other provider. One bill, one console, one set of defaults.
+- **Dual-stack.** It must have both a public IPv4 and a public IPv6 address.
+
+## Never ssh in as root and "just start"
+
+A fresh box is not ready. You never log in as root and begin. Before anything runs on it, it
+is hardened:
+
+- **SSH is locked down.** Password authentication is OFF, root login is OFF, key-only.
+  `fail2ban` bans brute-force attempts. Only the `server` user may connect (`AllowUsers
+  server`).
+- **A non-root user named `server`.** Always called `server`, always with `sudo`, and sudo
+  is **passwordless** for it. Root has no SSH access; you operate as `server`.
+- **Unattended security updates** are always on (with automatic reboots for kernel updates).
+- **A host firewall** (`ufw`): deny inbound by default, allow only SSH, 80, and 443.
+- **Docker** is installed, and `server` can run it without sudo.
+
+## Provision it with one command
+
+Do not do the above by hand. Run this on **your laptop** (not the server) against a
+brand-new box. It pre-checks the rules above and **refuses** to continue if the box is not a
+supported, dual-stack, Hetzner Ubuntu server, then it does everything:
+
+```bash
+bash <(curl -fsSL https://developers.enjab.ae/provision-vps.sh)
+```
+
+It asks for the VPS IP and the root password, installs your SSH key for the `server` user,
+and only disables root + password login **after** it has verified you can log in as `server`
+with your key, so you cannot get locked out. When it finishes, you log in with:
+
+```bash
+ssh server@<ip>
+```
+
+<Callout title="Where things live">
+The server runs your app (in Docker). It does **not** hold your database (that is always
+[Supabase](/docs/standards/databases)) and it is not object storage (that is
+[Cloudflare R2](/docs/standards/storage)). Keep the box stateless where you can.
+</Callout>

@@ -1,0 +1,31 @@
+---
+title: Databases
+description: Where data lives and how it is protected.
+icon: Database
+---
+
+Rules for every database an Enjab tool uses. Mandatory.
+
+## Always Supabase, always the Enjab account
+
+- **Every database is Supabase** (managed Postgres). Not a different provider, and **never a
+  database self-hosted on a VPS.** One managed platform, backups, and dashboard for the whole
+  fleet.
+- **Always the Enjab Supabase**, the one under the `ceo@enjab.ae` account, never a personal
+  Supabase. The organization owns the data, not an individual, so access, billing, and
+  offboarding stay in one place.
+
+## Row Level Security
+
+- **RLS is on by default.** Enable Row Level Security on every table where it makes sense,
+  which is almost every table that a client (browser, anon/auth key) can reach. Deny by
+  default, then write explicit policies.
+- **You may turn RLS off, but only when it is genuinely needed**, for example a table that is
+  only ever read or written by trusted server code using the service-role key and is never
+  exposed to a client key. Disabling RLS is a deliberate decision, not a default.
+
+## RAG and vector search
+
+- **Use Supabase for that too.** Vector search and retrieval (RAG) run on Supabase Postgres
+  with `pgvector`. Do not stand up a separate or self-hosted vector database; keep embeddings
+  next to the rest of the data, in the same managed Supabase.

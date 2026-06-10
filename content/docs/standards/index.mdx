@@ -16,4 +16,7 @@ tools safe, reliable, and consistent to operate.
   <Card title="Security" href="/docs/standards/security" description="PII protection: no raw emails on public pages (use the [at] / [dot] format), and more." />
   <Card title="Deployment" href="/docs/standards/deployment" description="Where and how tools are hosted and served: Vercel by default, Cloudflare-fronted with Cloudflare-handled HTTPS elsewhere." />
   <Card title="Pipeline" href="/docs/standards/pipeline" description="Source control and CI/CD: repos in the Enjab GitHub org, Git-based auto-deploy on push." />
+  <Card title="Servers (VPS)" href="/docs/standards/servers" description="Supported Ubuntu LTS on Hetzner only, dual-stack, hardened with one command (key-only server user, fail2ban, ufw, Docker)." />
+  <Card title="Databases" href="/docs/standards/databases" description="Always the Enjab Supabase (never personal, never self-hosted), RLS on by default, RAG on pgvector." />
+  <Card title="Storage" href="/docs/standards/storage" description="Object storage is king: Cloudflare R2 (Enjab account) preferred, or the VPS, never self-hosted." />
 </Cards>

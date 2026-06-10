@@ -1,0 +1,25 @@
+---
+title: Storage
+description: Where files and objects are stored.
+icon: HardDrive
+---
+
+Rules for storing files and objects. Mandatory.
+
+## Object storage is king
+
+For files, uploads, backups, and any blob, object storage is the default tool. There are
+exactly two allowed places to put things, and never a third:
+
+- **Cloudflare R2 (preferred).** In most cases, store on R2. Always the Enjab R2, the one
+  under the `ceo@enjab.ae` account, never a personal account. It is cheap, S3-compatible, has
+  no egress fees, and the organization owns it.
+- **The VPS itself**, but **only when you are sure it is genuinely better** for that case (for
+  example, transient working files an app reads and rewrites constantly, right next to the
+  process). Default to R2; reach for the disk only with a reason.
+
+## Never self-host object storage
+
+Do not run your own object store (no MinIO, no Ceph, no homemade S3 on a box). Object storage
+is a solved, managed problem; use R2. Self-hosting it just adds an operational burden and a
+single point of failure you do not need.
