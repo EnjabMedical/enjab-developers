@@ -39,6 +39,10 @@ supported, dual-stack, Hetzner Ubuntu server, then it does everything:
 bash <(curl -fsSL https://developers.enjab.ae/provision-vps.sh)
 ```
 
+Run it from **macOS, Linux, or Windows via WSL** (it is a bash script and needs OpenSSH 8.4+,
+which modern macOS and Linux already have). Native Windows (PowerShell/cmd) is not supported;
+use WSL.
+
 It asks for the VPS IP and the root password, installs your SSH key for the `server` user,
 and only disables root + password login **after** it has verified you can log in as `server`
 with your key, so you cannot get locked out. When it finishes, you log in with:
