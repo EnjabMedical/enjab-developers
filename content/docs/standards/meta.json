@@ -1,0 +1,2 @@
+{ "title": "Engineering Standards", "icon": "ServerCog",
+  "pages": ["index", "security", "deployment", "pipeline"] }
