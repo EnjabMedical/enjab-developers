@@ -5,9 +5,23 @@ icon: ServerCog
 ---
 
 Changes to the [Engineering Standards](/docs/standards), newest first. The current standards
-version is `2026.06.08f`. To bring a tool up to date, see
+version is `2026.06.11a`. To bring a tool up to date, see
 [Update an existing tool](/docs/update-an-existing-tool/standards) or use the combined update
 prompt on the [Update overview](/docs/update-an-existing-tool).
+
+## 2026.06.11a: Cloudflare HTTPS is Flexible (plain HTTP origin)
+
+`Engineering Standards` · 11 Jun 2026
+
+**Changed.** For self-hosted (non-Vercel) tools behind Cloudflare, the TLS setup is now
+**Flexible**: the origin serves plain HTTP and installs no certificate at all; Cloudflare
+terminates HTTPS at the edge (Universal SSL) and talks HTTP to the origin. This replaces the
+previous Full (strict) + Cloudflare Origin Certificate guidance. The origin must listen on
+HTTP only and must not redirect to HTTPS itself. See [Deployment](/docs/standards/deployment).
+
+**Apply.** In Cloudflare, set SSL/TLS encryption mode to Flexible and keep Always Use HTTPS
+on. Remove any origin certificate and any origin-side HTTP-to-HTTPS redirect; serve the app
+over HTTP.
 
 ## 2026.06.08f: Object storage on Cloudflare R2, never self-hosted
 

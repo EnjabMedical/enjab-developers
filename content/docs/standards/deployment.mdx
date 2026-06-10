@@ -30,14 +30,17 @@ protection, and a hidden origin IP for free, and it is what makes the HTTPS rule
 
 ### Let Cloudflare handle HTTPS
 
-Do not chase certificates on the origin. Let Cloudflare terminate TLS at the edge so you are
-never renewing a public certificate by hand:
+The origin serves plain **HTTP**. Cloudflare does all the TLS work at the edge, so the server
+never has a certificate to install, renew, or get wrong:
 
-- Cloudflare's edge certificate (Universal SSL) is automatic and auto-renewed. Zero work.
-- On the origin, install a **Cloudflare Origin Certificate** (valid for years, no renewals)
-  and set the **SSL/TLS mode to Full (strict)**, so the hop from Cloudflare to your origin
-  stays encrypted and verified.
-- Turn on **Always Use HTTPS** so every request is upgraded.
+- Set the **SSL/TLS encryption mode to Flexible**. Cloudflare's edge certificate (Universal
+  SSL, automatic and auto-renewed) encrypts the visitor-to-Cloudflare hop. The
+  Cloudflare-to-origin hop is plain HTTP, so the origin needs no certificate and no cert
+  validation.
+- Turn on **Always Use HTTPS** so every visitor is upgraded to HTTPS at the edge.
+- The origin listens on **HTTP only** and must **not** redirect to HTTPS itself (Cloudflare
+  already presents HTTPS to the world; an origin-side redirect would loop).
 
-Set it once, then stop thinking about certificates. (Again: none of this applies on Vercel,
+Trade-off to be aware of: Flexible does not encrypt the Cloudflare-to-origin hop. That is the
+deliberate choice here for simplicity (no certs on the box). (None of this applies on Vercel,
 which does TLS for you.)
