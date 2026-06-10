@@ -5,9 +5,23 @@ icon: ServerCog
 ---
 
 Changes to the [Engineering Standards](/docs/standards), newest first. The current standards
-version is `2026.06.08b`. To bring a tool up to date, see
+version is `2026.06.08c`. To bring a tool up to date, see
 [Update an existing tool](/docs/update-an-existing-tool/standards) or use the combined update
 prompt on the [Update overview](/docs/update-an-existing-tool).
+
+## 2026.06.08c: No raw emails on public pages
+
+`Engineering Standards` · 8 Jun 2026
+
+**Changed.** New security rule. On public, unauthenticated pages, never write an email as
+plaintext or a `mailto:` link, harvesters scrape both from the page source. Show it broken up
+in a fixed format instead: `ceo [at] enjab [dot] ae` (replace `@` with ` [at] ` and each `.`
+with ` [dot] `), as plain text, no `mailto:`. Behind login, emails can be shown normally. See
+[Security](/docs/standards/security).
+
+**Apply.** Sweep your public pages (landing, contact, footer) for any plaintext email or
+`mailto:` link and rewrite each in the `[at]` / `[dot]` format. Leave auth-gated pages as they
+are.
 
 ## 2026.06.08b: Deploy from Git, on the Enjab GitHub org
 

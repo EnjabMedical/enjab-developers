@@ -4,6 +4,39 @@ description: Security standards for building and operating Enjab tools.
 icon: ShieldCheck
 ---
 
-<Callout title="Draft">
-Placeholder. The security standards will be written here.
+Security rules for every Enjab tool. These are mandatory.
+
+## No raw emails on public pages
+
+On any public, unauthenticated page (landing pages, contact pages, footers, anything reachable
+without signing in), never write an email address as **plaintext** or as a **`mailto:` link**.
+Bots and scrapers harvest the raw HTML, collect every address they find, and feed it to
+spammers. A `mailto:` is just as exposed: the real address sits in the `href` even when the
+visible text is changed.
+
+Show the address broken up in a fixed, human-readable format instead. A person reads it at a
+glance; an automated harvester does not collect it as an email:
+
+```
+ceo [at] enjab [dot] ae
+```
+
+The rules:
+
+- Replace `@` with ` [at] ` and every `.` with ` [dot] ` (lowercase, single spaces, square
+  brackets). Use this exact format everywhere, so every Enjab page reads the same.
+- **Plain text only.** Do not wrap it in a `mailto:` link, that re-exposes the real address.
+- This applies to **public, no-auth pages only**. Behind login, where harvesters cannot reach,
+  show emails normally (a real `mailto:` link is fine).
+- Phone numbers carry the same risk. Break them up in the same spirit on public pages.
+
+If a page does not actually need to display an address, an even stronger option is a contact
+form that posts to the server, so no address appears on the page at all.
+
+<Callout title="What this does and does not do">
+This is intentionally simple so it applies anywhere, on any stack, with no component or
+JavaScript. It stops the automated harvesters that scrape plaintext and `mailto:` links from
+the page source, which is the real, high-volume threat. It is not meant to defeat a determined
+scraper that runs a full browser, and it trades away click-to-email. That is the accepted
+trade.
 </Callout>
