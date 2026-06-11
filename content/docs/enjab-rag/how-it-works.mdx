@@ -22,8 +22,12 @@ The content is turned into text based on its type (see the table below), images 
 One model pass writes a **title**, a **summary**, **tags**, the **language**, and a flexible **metadata** object (dates, departments, names, document type, whatever it can confidently extract). Never invents facts.
 </Step>
 <Step>
-### Chunk & embed
-The text is split into overlapping, boundary-aware chunks (~1,200 characters) and each chunk is embedded with OpenAI `text-embedding-3-large` (3072 dimensions).
+### Chunk (structure-aware)
+Splitting respects what the document **is**, not a blind character count. Tables and spreadsheets keep their **header row on every chunk** (so each chunk is self-describing); prose keeps its **section heading** attached; and splitting cascades through real boundaries (headings → paragraphs → sentences → lines). Every chunk is bounded so it always fits the embedding model.
+</Step>
+<Step>
+### Contextualize & embed
+Each chunk gets **Contextual Retrieval**: a fast model writes a one-line context situating the chunk in its document (which document, section, and entity it concerns), and that context is embedded **together with** the chunk, so short or ambiguous chunks (a single spreadsheet row, a bare figure) still retrieve correctly. The original chunk is stored as the returned `content`; the contextualized text is what gets embedded with OpenAI `text-embedding-3-large` (3072 dimensions).
 </Step>
 <Step>
 ### Index
@@ -59,7 +63,8 @@ Enjab RAG holds **operational knowledge**, how the clinics run: hours, policies,
 
 | Concern | Choice |
 |---|---|
+| Chunking | Structure-aware (table-header + heading propagation) + Contextual Retrieval |
 | Embeddings | OpenAI `text-embedding-3-large`, 3072-dim |
 | Vector store | Supabase Postgres + pgvector (`halfvec`, HNSW, cosine) |
 | Originals | Cloudflare R2 (object storage) |
-| Processing | OpenAI (extraction, OCR, transcription, summarize/tag) |
+| Processing | OpenAI (extraction, OCR, transcription, summarize/tag, per-chunk context) |
