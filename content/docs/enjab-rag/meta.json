@@ -1,0 +1,5 @@
+{
+  "title": "Enjab RAG",
+  "icon": "Layers",
+  "pages": ["index", "connect-an-agent", "api", "authentication", "how-it-works"]
+}

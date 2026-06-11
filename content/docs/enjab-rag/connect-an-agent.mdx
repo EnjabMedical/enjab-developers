@@ -1,0 +1,96 @@
+---
+title: Connect an agent
+description: Wire any agent to Enjab RAG over MCP so it shares the same operational knowledge as every other Enjab agent.
+icon: Plug
+---
+
+Enjab RAG ships a native **MCP server** (Streamable HTTP, JSON-RPC). Point any MCP-capable agent at it and it gets two tools, `search` and `fetch`, no SDK or glue code required. This is the way agents connect.
+
+- **Endpoint:** `https://rag.enjab.ae/api/mcp`
+- **Auth:** `Authorization: Bearer enjabrag_…` (an API key)
+- **Protocol:** MCP `2024-11-05`, transport `http`
+
+<Steps>
+
+<Step>
+### Mint an API key
+
+Sign in at [rag.enjab.ae/dash/keys](https://rag.enjab.ae/dash/keys) and create a key for the agent. A **read-only** key is all an agent needs to search and fetch. Copy it once, only its hash is stored. See [Authentication](/docs/enjab-rag/authentication).
+</Step>
+
+<Step>
+### Add the MCP server
+
+**Claude Code (CLI):**
+
+```bash
+claude mcp add --transport http enjab-rag https://rag.enjab.ae/api/mcp \
+  --header "Authorization: Bearer enjabrag_YOUR_KEY"
+```
+
+**Generic MCP client (`mcp.json` / config):**
+
+```json
+{
+  "mcpServers": {
+    "enjab-rag": {
+      "type": "http",
+      "url": "https://rag.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabrag_YOUR_KEY" }
+    }
+  }
+}
+```
+</Step>
+
+<Step>
+### Use the tools
+
+The agent now has:
+
+- **`search`** — `{ query: string, limit?: number, collection?: string }`. Returns ranked passages with each one's source title, summary, and metadata. The agent calls this to ground answers about how the clinics operate.
+- **`fetch`** — `{ id: string }`. Returns one full document (extracted text, summary, tags, metadata) by id, useful after a `search` hit to read the whole source.
+
+Tell the agent, in its system prompt, to **search Enjab RAG before answering operational questions** so it grounds on shared knowledge instead of guessing.
+</Step>
+
+</Steps>
+
+## Hand this to your agent
+
+Drop this into the agent you are building so it connects itself:
+
+```
+Connect to Enjab RAG, the shared knowledge base for Enjab's agents. It is an MCP
+server at https://rag.enjab.ae/api/mcp (transport: http) authenticated with a Bearer
+API key (format enjabrag_...). Add it as an MCP server with the header
+"Authorization: Bearer <key>". It exposes two tools: `search` (query the shared
+operational knowledge) and `fetch` (read a full document by id). Before answering any
+question about how the clinics operate, call `search` first and ground the answer in
+the results. Read https://developers.enjab.ae/docs/enjab-rag for the full reference.
+```
+
+## Raw protocol (custom clients)
+
+The endpoint is plain JSON-RPC over HTTP POST. Initialize, list tools, then call one:
+
+```bash
+# tools/list
+curl -s https://rag.enjab.ae/api/mcp \
+  -H "Authorization: Bearer enjabrag_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+
+# tools/call -> search
+curl -s https://rag.enjab.ae/api/mcp \
+  -H "Authorization: Bearer enjabrag_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call",
+       "params":{"name":"search","arguments":{"query":"what time do the clinics open?"}}}'
+```
+
+`tools/call` returns a `content` array (a human-readable text block) plus `structuredContent` (the raw `results` array, same shape as the [REST search response](/docs/enjab-rag/api)). Supported methods: `initialize`, `notifications/initialized`, `ping`, `tools/list`, `tools/call`.
+
+<Callout type="info">
+The MCP server is read-oriented (`search` + `fetch`). To **add** knowledge programmatically, use the write-scoped [`/api/ingest`](/docs/enjab-rag/api) endpoint.
+</Callout>

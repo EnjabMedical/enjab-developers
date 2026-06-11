@@ -1,0 +1,47 @@
+---
+title: Overview
+description: Enjab RAG is the shared knowledge brain for Enjab's agents, one place that ingests, processes, and serves operational knowledge over MCP and a REST API.
+icon: Layers
+---
+
+Enjab RAG is the shared, long-term memory for every Enjab agent. You send it knowledge (files, text, images, audio, or links); it extracts and processes the content, embeds it, and serves it back as searchable context, over a native **MCP** server and a simple **REST API**.
+
+- **Home:** [rag.enjab.ae](https://rag.enjab.ae)
+- **MCP endpoint:** `https://rag.enjab.ae/api/mcp`
+- **REST base:** `https://rag.enjab.ae`
+
+<Callout type="warn">
+**Every Enjab agent connects to Enjab RAG.** It is the single source of shared operational knowledge (how the clinics run). Wiring each agent to it is what keeps them consistent, instead of every agent holding its own stale copy. If you are building or running an Enjab agent, connect it, see [Connect an agent](/docs/enjab-rag/connect-an-agent).
+</Callout>
+
+## What it does
+
+- **Ingests anything** — PDF, Word, spreadsheets, images, audio, text, and web links.
+- **Processes, not just stores** — extracts the text (OCR for images, transcription for audio), then writes a title, summary, tags, and structured metadata with a model.
+- **Embeds and indexes** — chunks the content and stores OpenAI `text-embedding-3-large` vectors in Postgres (pgvector) for semantic search.
+- **Serves retrieval** — agents call `search` (and `fetch`) to ground their answers in real, current operational knowledge.
+
+The agents do the reasoning and answering; Enjab RAG is the retrieval layer they share.
+
+## Two ways to integrate
+
+<Cards>
+  <Card title="Connect an agent (MCP)" href="/docs/enjab-rag/connect-an-agent" description="The native path. Point any MCP client at the server and it gets the search + fetch tools. This is how agents should connect." />
+  <Card title="REST API" href="/docs/enjab-rag/api" description="POST /api/search and /api/ingest for backends and tools that are not MCP clients." />
+  <Card title="Authentication" href="/docs/enjab-rag/authentication" description="API keys (Bearer), read vs write scopes, and where to mint them." />
+  <Card title="How it works" href="/docs/enjab-rag/how-it-works" description="The ingestion pipeline, supported inputs, collections, and the embedding model." />
+</Cards>
+
+## Endpoints at a glance
+
+| Method | Path | Purpose | Key |
+|---|---|---|---|
+| `POST` | `/api/mcp` | MCP server: the `search` + `fetch` tools | any |
+| `POST` | `/api/search` | Semantic search, ranked passages | read |
+| `POST` | `/api/ingest` | Add a file, URL, or text | write |
+
+All requests authenticate with an API key in the `Authorization: Bearer` header. See [Authentication](/docs/enjab-rag/authentication).
+
+<Callout type="info">
+**Coding agents:** these docs are published for agents too. Point your agent at [`https://developers.enjab.ae/llms.txt`](https://developers.enjab.ae/llms.txt) plus this section and it has everything it needs to connect a project to Enjab RAG.
+</Callout>

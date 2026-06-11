@@ -1,0 +1,42 @@
+---
+title: Authentication
+description: API keys, read vs write scopes, and where to mint them.
+icon: KeyRound
+---
+
+Every request to Enjab RAG carries an API key. Keys look like `enjabrag_…` and are sent in the `Authorization` header:
+
+```http
+Authorization: Bearer enjabrag_YOUR_KEY
+```
+
+The `x-api-key: enjabrag_YOUR_KEY` header is accepted as an alternative.
+
+## Minting keys
+
+Staff sign in at [rag.enjab.ae/dash/keys](https://rag.enjab.ae/dash/keys) (Sign in with Enjab) and create a key per agent or integration. The raw key is shown **once**, only its SHA-256 hash is stored, so copy it then. Lost a key? Revoke it and mint a new one.
+
+<Callout type="info">
+Give each agent its **own** named key. That way usage is traceable per agent and you can revoke one without disrupting the others.
+</Callout>
+
+## Scopes
+
+| Scope | Can do | Use for |
+|---|---|---|
+| **Read** | `search`, `fetch`, the MCP server | Agents that consume knowledge (most agents). |
+| **Read + write** | the above **plus** `/api/ingest` | Pipelines and tools that add knowledge. |
+
+A read key on `/api/ingest` returns `401`. Default to read-only keys for agents and reserve write keys for ingestion jobs.
+
+## Endpoints by scope
+
+| Endpoint | Minimum scope |
+|---|---|
+| `POST /api/mcp` | read |
+| `POST /api/search` | read |
+| `POST /api/ingest` | write |
+
+## Rotation
+
+Keys do not expire on their own. Rotate by minting a replacement, updating the agent's config, then revoking the old one. Because only the hash is stored, a key that leaks cannot be recovered, revoke and replace it.

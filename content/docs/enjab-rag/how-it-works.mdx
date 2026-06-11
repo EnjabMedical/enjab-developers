@@ -1,0 +1,65 @@
+---
+title: How it works
+description: The ingestion pipeline, supported inputs, collections, and the embedding model.
+icon: Workflow
+---
+
+Enjab RAG processes knowledge, it does not just store it. Every ingest runs the same pipeline, so search results come back with a clean title, summary, tags, and structured fields no matter what you sent in.
+
+## The pipeline
+
+<Steps>
+<Step>
+### Receive & keep the original
+The raw file is stored in object storage (Cloudflare R2) so the original is always recoverable. Text and links skip this step.
+</Step>
+<Step>
+### Extract the text
+The content is turned into text based on its type (see the table below), images via OCR, audio via transcription.
+</Step>
+<Step>
+### Process with a model
+One model pass writes a **title**, a **summary**, **tags**, the **language**, and a flexible **metadata** object (dates, departments, names, document type, whatever it can confidently extract). Never invents facts.
+</Step>
+<Step>
+### Chunk & embed
+The text is split into overlapping, boundary-aware chunks (~1,200 characters) and each chunk is embedded with OpenAI `text-embedding-3-large` (3072 dimensions).
+</Step>
+<Step>
+### Index
+Chunks and their vectors are stored in Postgres with pgvector (`halfvec`, cosine, HNSW index). `search` ranks chunks by cosine similarity within a collection.
+</Step>
+</Steps>
+
+## Supported inputs
+
+| Input | How it is read |
+|---|---|
+| **PDF** | Text layer extracted; scanned / image-only PDFs fall back to model OCR. |
+| **Word** (`.docx`) | Text extracted (mammoth). |
+| **Spreadsheet** (`.xlsx`, `.xls`, `.csv`) | Parsed per sheet into rows the model can read. |
+| **Image** (`png`, `jpg`, `webp`, …) | OCR'd with a vision model. |
+| **Audio** (`mp3`, `wav`, `m4a`, …) | Transcribed with Whisper. |
+| **Text** | Indexed directly. |
+| **Link** | The page is fetched and reduced to readable text. |
+
+## Titles & metadata
+
+You never have to name a document. The model writes the **best title** from the content (you can override it with an explicit `title` on the API, but the default is automatic). Summaries, tags, and the structured `metadata` object come from the same pass and are returned on every search result.
+
+## Collections
+
+Knowledge lives in **collections**. Today there is a single `global` collection (all of the centre's operational knowledge). The `collection` parameter exists on every endpoint so per-centre or per-sensitivity scoping can be added later without breaking anything, omit it and you get `global`.
+
+## What goes in
+
+Enjab RAG holds **operational knowledge**, how the clinics run: hours, policies, procedures, FAQs, handbooks, directories. It is not for patient records or clinical data.
+
+## Storage & model summary
+
+| Concern | Choice |
+|---|---|
+| Embeddings | OpenAI `text-embedding-3-large`, 3072-dim |
+| Vector store | Supabase Postgres + pgvector (`halfvec`, HNSW, cosine) |
+| Originals | Cloudflare R2 (object storage) |
+| Processing | OpenAI (extraction, OCR, transcription, summarize/tag) |

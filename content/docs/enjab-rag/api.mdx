@@ -1,0 +1,129 @@
+---
+title: REST API
+description: Search and ingest over plain HTTP, for backends and tools that are not MCP clients.
+icon: Code
+---
+
+For anything that is not an MCP client (a backend, a webhook, a script), Enjab RAG exposes two HTTP endpoints. Base URL: `https://rag.enjab.ae`. Every request sends an API key in the `Authorization: Bearer` header, see [Authentication](/docs/enjab-rag/authentication).
+
+## Search
+
+Semantic search over the shared knowledge. **Read key.**
+
+```http
+POST /api/search
+Authorization: Bearer enjabrag_YOUR_KEY
+Content-Type: application/json
+```
+
+**Body**
+
+| Field | Type | Default | Notes |
+|---|---|---|---|
+| `query` | string | — | Required. Natural-language query. |
+| `limit` | number | `8` | Max passages (1–50). |
+| `collection` | string | `global` | Collection to search. |
+
+**Example**
+
+```bash
+curl -s https://rag.enjab.ae/api/search \
+  -H "Authorization: Bearer enjabrag_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"where do patients park?","limit":5}'
+```
+
+**Response** — `{ results: [...] }`, ranked by similarity:
+
+```json
+{
+  "results": [
+    {
+      "chunk_id": "…",
+      "document_id": "…",
+      "idx": 0,
+      "content": "Free underground parking is available on levels B1 and B2…",
+      "similarity": 0.74,
+      "title": "Parking info",
+      "summary": "Parking and valet details for the centre.",
+      "tags": ["parking", "valet"],
+      "metadata": { "parking_levels": ["B1", "B2"] },
+      "source_type": "text"
+    }
+  ]
+}
+```
+
+```ts title="fetch (JS/TS)"
+const res = await fetch("https://rag.enjab.ae/api/search", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.ENJAB_RAG_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ query: "what time do the clinics open?", limit: 5 }),
+});
+const { results } = await res.json();
+```
+
+## Ingest
+
+Add a document. It is extracted, processed (title, summary, tags, metadata are generated automatically), chunked, embedded, and indexed. **Write key.**
+
+```http
+POST /api/ingest
+Authorization: Bearer enjabrag_YOUR_KEY
+```
+
+Accepts either a file (multipart) or JSON:
+
+**File (multipart/form-data)** — field `file`, plus optional `collection`:
+
+```bash
+curl -s https://rag.enjab.ae/api/ingest \
+  -H "Authorization: Bearer enjabrag_WRITE_KEY" \
+  -F "file=@refund-policy.pdf"
+```
+
+**URL or text (application/json):**
+
+```bash
+# a link
+curl -s https://rag.enjab.ae/api/ingest \
+  -H "Authorization: Bearer enjabrag_WRITE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://enjab.ae/policies/refunds"}'
+
+# raw text
+curl -s https://rag.enjab.ae/api/ingest \
+  -H "Authorization: Bearer enjabrag_WRITE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Clinic hours are 8am to 9pm daily."}'
+```
+
+| Field | Type | Notes |
+|---|---|---|
+| `file` | file | Multipart. PDF, Word, spreadsheet, image, audio, or text. |
+| `url` | string | JSON. A web page to fetch and index. |
+| `text` | string | JSON. Raw text to index. |
+| `collection` | string | Optional. Defaults to `global`. |
+| `title` | string | Optional. Omit it, the model writes the best title. |
+
+**Response** — `{ id, status }`. `status` is `ready` or `failed` (with an `error`, HTTP 422):
+
+```json
+{ "id": "fabe8a3a-7806-4207-a53e-91b5a4ffaceb", "status": "ready" }
+```
+
+<Callout type="info">
+Ingestion runs the full extract → process → embed pipeline inline and can take a few seconds (longer for audio or large PDFs). See [How it works](/docs/enjab-rag/how-it-works) for the supported inputs and what gets extracted.
+</Callout>
+
+## Errors
+
+| Status | Meaning |
+|---|---|
+| `401` | Missing or invalid API key (or a read key on `/api/ingest`). |
+| `400` | Missing `query`, or no `file` / `url` / `text` provided. |
+| `422` | Ingest ran but nothing could be extracted (`{ status: "failed", error }`). |
+| `500` | Unexpected server error. |
