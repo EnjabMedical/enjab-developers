@@ -1,0 +1,52 @@
+---
+title: "Connect to Enjab RAG"
+description: "Wire an existing tool or agent to Enjab RAG, the shared knowledge base, and keep it current."
+icon: Layers
+---
+
+Every Enjab agent should be connected to [Enjab RAG](/docs/enjab-rag) so it grounds its answers on the same shared operational knowledge instead of its own stale copy. If your tool is not connected yet, connect it. When Enjab RAG changes, the [Enjab RAG changelog](/docs/changelog/enjab-rag) lists what changed and whether any action is needed (most changes are server-side and need none).
+
+## The update prompt
+
+Hand an agent this message:
+
+```
+Connect this project to Enjab RAG, the shared knowledge base for Enjab's agents, and bring it
+up to the current contract. Read https://developers.enjab.ae/llms.txt and the Enjab RAG docs
+at https://developers.enjab.ae/docs/enjab-rag (plus the changelog at
+https://developers.enjab.ae/docs/changelog/enjab-rag).
+
+If this is an AGENT: add Enjab RAG as an MCP server at https://rag.enjab.ae/api/mcp
+(transport: http) with the header "Authorization: Bearer <key>" (an enjabrag_... API key),
+and add to the system prompt: "Before answering any question about how the clinics operate,
+call the Enjab RAG `search` tool first and ground the answer in the results."
+
+If this is a BACKEND/tool: call POST https://rag.enjab.ae/api/search with a read key to
+retrieve, and POST /api/ingest with a write key to add knowledge.
+
+Apply ONLY the changelog items this project has not adopted yet. Do not refactor anything
+else, keep the change surface minimal.
+```
+
+The agent fetches the docs, connects (or re-checks) the integration, and applies only the delta.
+
+## What to verify
+
+<Steps>
+<Step>
+### The connection exists
+Agents have Enjab RAG registered as an MCP server (`https://rag.enjab.ae/api/mcp`); backends call `/api/search` (and `/api/ingest` if they add knowledge). See [Connect an agent](/docs/enjab-rag/connect-an-agent) and the [REST API](/docs/enjab-rag/api).
+</Step>
+<Step>
+### The key scope is right
+A **read** key is enough to search and fetch; only ingestion jobs need a **write** key. Give each agent its own named key, minted at [rag.enjab.ae/dash/keys](https://rag.enjab.ae/dash/keys). See [Authentication](/docs/enjab-rag/authentication).
+</Step>
+<Step>
+### Agents search before answering
+The system prompt instructs the agent to call `search` before answering operational questions, so it grounds on shared knowledge rather than guessing.
+</Step>
+</Steps>
+
+<Callout title="Latest change">
+Enjab RAG launched (11 Jun 2026) with structure-aware + Contextual Retrieval chunking. Retrieval improves server-side with no action needed; re-ingest a document only if you want it re-chunked. See the [changelog](/docs/changelog/enjab-rag).
+</Callout>

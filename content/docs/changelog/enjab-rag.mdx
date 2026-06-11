@@ -1,0 +1,23 @@
+---
+title: Enjab RAG
+description: Version history for Enjab RAG, the shared knowledge base. Each entry says what changed and the action (if any) to adopt it.
+icon: Layers
+---
+
+Changes to [Enjab RAG](/docs/enjab-rag), newest first. Enjab RAG is a hosted service, most changes are server-side and need no action from connected tools. To connect or re-check a tool, see [Connect to Enjab RAG](/docs/update-an-existing-tool/rag).
+
+## 2026.06.11a: Enjab RAG is live
+
+`Enjab RAG` · 11 Jun 2026
+
+**New.** The shared knowledge brain for Enjab's agents is live at [rag.enjab.ae](https://rag.enjab.ae). It ingests files, text, images, audio, and links; extracts and processes them (OCR, transcription, then an auto title, summary, tags, and structured metadata); and serves retrieval over a native **MCP** server (`search` + `fetch` tools) and a **REST API** (`/api/search`, `/api/ingest`). Embeddings use OpenAI `text-embedding-3-large` (3072-dim) in Postgres + pgvector.
+
+**Apply.** Connect every Enjab agent to it so they share one source of operational knowledge, see [Connect an agent](/docs/enjab-rag/connect-an-agent). Mint a key at [rag.enjab.ae/dash/keys](https://rag.enjab.ae/dash/keys).
+
+## 2026.06.11b: Smart chunking (structure-aware + Contextual Retrieval)
+
+`Enjab RAG` · 11 Jun 2026
+
+**New.** Chunking now respects document structure (tables keep their header row on every chunk, prose keeps its section heading) and applies **Contextual Retrieval**: a model writes a one-line, document-aware context for each chunk that is embedded alongside it, so short or ambiguous chunks (a spreadsheet row, a bare figure) retrieve correctly. Large boundary-less documents (big spreadsheets) that previously failed to ingest now chunk and index reliably.
+
+**Apply.** Nothing, server-side. Retrieval quality improves automatically; re-ingest a document if you want it re-chunked under the new logic.

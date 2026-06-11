@@ -23,6 +23,26 @@ Enjab RAG is the shared, long-term memory for every Enjab agent. You send it kno
 
 The agents do the reasoning and answering; Enjab RAG is the retrieval layer they share.
 
+## Quickstart
+
+Mint a key at [rag.enjab.ae/dash/keys](https://rag.enjab.ae/dash/keys), then add knowledge and retrieve it:
+
+```bash
+# 1. Add knowledge (write key)
+curl -s https://rag.enjab.ae/api/ingest \
+  -H "Authorization: Bearer enjabrag_WRITE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"The Dermatology clinic is open 8am to 9pm daily."}'
+
+# 2. Retrieve it (read key)
+curl -s https://rag.enjab.ae/api/search \
+  -H "Authorization: Bearer enjabrag_READ_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"when is dermatology open?"}'
+```
+
+Building an agent? Skip straight to [Connect an agent](/docs/enjab-rag/connect-an-agent), the MCP server is the native path, no HTTP plumbing.
+
 ## Two ways to integrate
 
 <Cards>

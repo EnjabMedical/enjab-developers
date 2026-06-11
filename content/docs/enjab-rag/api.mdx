@@ -106,8 +106,20 @@ curl -s https://rag.enjab.ae/api/ingest \
 | `file` | file | Multipart. PDF, Word, spreadsheet, image, audio, or text. |
 | `url` | string | JSON. A web page to fetch and index. |
 | `text` | string | JSON. Raw text to index. |
-| `collection` | string | Optional. Defaults to `global`. |
+| `collection` | string | Optional. Defaults to `global` (the only collection today; an unknown one fails). |
 | `title` | string | Optional. Omit it, the model writes the best title. |
+
+```ts title="ingest a file (JS/TS)"
+const form = new FormData();
+form.set("file", new Blob([bytes]), "refund-policy.pdf");
+
+const res = await fetch("https://rag.enjab.ae/api/ingest", {
+  method: "POST",
+  headers: { Authorization: `Bearer ${process.env.ENJAB_RAG_WRITE_KEY}` },
+  body: form,
+});
+const { id, status } = await res.json();
+```
 
 **Response** — `{ id, status }`. `status` is `ready` or `failed` (with an `error`, HTTP 422):
 
@@ -116,8 +128,12 @@ curl -s https://rag.enjab.ae/api/ingest \
 ```
 
 <Callout type="info">
-Ingestion runs the full extract → process → embed pipeline inline and can take a few seconds (longer for audio or large PDFs). See [How it works](/docs/enjab-rag/how-it-works) for the supported inputs and what gets extracted.
+Ingestion runs the full extract → process → contextualize → embed pipeline inline. Allow a few seconds, more for audio, large PDFs, or documents that produce many chunks (each chunk gets a context pass). See [How it works](/docs/enjab-rag/how-it-works).
 </Callout>
+
+## Reading a full document
+
+There is no REST "get document by id" endpoint. To pull a whole source back (after a `search` hit), agents use the MCP [`fetch`](/docs/enjab-rag/connect-an-agent) tool with the `document_id` from the search result.
 
 ## Errors
 

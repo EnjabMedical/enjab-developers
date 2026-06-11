@@ -1,13 +1,13 @@
 ---
 title: Overview
-description: Bring an existing Enjab tool up to date on Enjab UI, Enjab Auth, and the Engineering Standards, with a minimal change surface.
+description: Bring an existing Enjab tool up to date on Enjab UI, Enjab Auth, Enjab RAG, and the Engineering Standards, with a minimal change surface.
 icon: RefreshCw
 ---
 
-Enjab evolves. Updating a tool means tracking the three backbones, the **Enjab UI** design
-system, the **Enjab Auth** integration, and the **Engineering Standards**, and adopting only
-what changed. The principle is always the same: apply ONLY the changelog entries your tool
-has not adopted, and touch nothing else.
+Enjab evolves. Updating a tool means tracking the backbones, the **Enjab UI** design system,
+the **Enjab Auth** integration, the **Enjab RAG** connection, and the **Engineering
+Standards**, and adopting only what changed. The principle is always the same: apply ONLY the
+changelog entries your tool has not adopted, and touch nothing else.
 
 <Callout type="info" title="Minimal surface">
 Updates are not refactors. Send your agent the [Changelog](/docs/changelog), have them
@@ -15,27 +15,29 @@ identify which entries your tool has not adopted yet, and apply exactly those. S
 Do not restyle or reorganize surrounding code.
 </Callout>
 
-## Three tracks
+## The tracks
 
 <Cards>
   <Card title="Update the UI" href="/docs/update-an-existing-tool/ui" description="Re-install changed Enjab UI components and re-apply the theme, per the Enjab UI changelog." />
   <Card title="Update the auth integration" href="/docs/update-an-existing-tool/auth" description="Re-sync the drop-in reference files and re-check the integration rules, per the Enjab Auth changelog." />
+  <Card title="Connect to Enjab RAG" href="/docs/update-an-existing-tool/rag" description="Wire the tool/agent to the shared knowledge base and keep it current, per the Enjab RAG changelog." />
   <Card title="Update to the standards" href="/docs/update-an-existing-tool/standards" description="Adopt the infrastructure and process rules (security, deployment, pipeline), per the Engineering Standards changelog." />
 </Cards>
 
 ## Update everything, one prompt
 
-Hand this to a coding agent to bring a tool up to date on Enjab UI, Enjab Auth, and the
-Engineering Standards in one go. It reads the central docs, works out what the project has
-not adopted, and applies only that. For a focused update of just one area, use the three
-tracks above.
+Hand this to a coding agent to bring a tool up to date on Enjab UI, Enjab Auth, Enjab RAG, and
+the Engineering Standards in one go. It reads the central docs, works out what the project has
+not adopted, and applies only that. For a focused update of just one area, use the tracks
+above.
 
-<Callout title="Update everything (UI + Auth + Standards)">
+<Callout title="Update everything (UI + Auth + RAG + Standards)">
 ```text
-Update this project to the latest Enjab standards (UI, Auth, and Engineering Standards). Read
-https://developers.enjab.ae/llms.txt and the changelog at
-https://developers.enjab.ae/docs/changelog (the Enjab UI, Enjab Auth, and Engineering
-Standards pages), then apply ONLY the changelog entries this project has not adopted yet.
+Update this project to the latest Enjab standards (UI, Auth, RAG, and Engineering Standards).
+Read https://developers.enjab.ae/llms.txt and the changelog at
+https://developers.enjab.ae/docs/changelog (the Enjab UI, Enjab Auth, Enjab RAG, and
+Engineering Standards pages), then apply ONLY the changelog entries this project has not
+adopted yet.
 
 For Enjab UI: re-install changed components with `npx shadcn add @enjab-ui/<name>`
 (overwrite) and re-apply the theme with `npx shadcn add https://ui.enjab.ae/r/theme.json`
@@ -45,6 +47,11 @@ For Enjab Auth: re-sync the drop-in reference files (lib/enjab-auth.ts, the call
 logout routes, proxy.ts) and re-check the integration rules (re-validate every request via
 /userinfo with cache: "no-store", no login UI of your own, confirmed per-tool sign-out,
 access is binary unless the tool is role-aware).
+
+For Enjab RAG: if this is an agent, connect it to the shared knowledge base as an MCP server
+at https://rag.enjab.ae/api/mcp (Bearer enjabrag_... key) and have it call `search` before
+answering operational questions; if it is a backend, call /api/search (read) and /api/ingest
+(write). 
 
 For the Engineering Standards: check the project against each published standard (security,
 deployment, pipeline, and the like) and adjust config, CI/CD, and code to match the ones it
@@ -60,7 +67,7 @@ This site is the single source of truth for every Enjab tool, published as plain
 agents:
 
 - **The contract**: https://developers.enjab.ae/llms.txt
-- **What changed**: the [Changelog](/docs/changelog) ([Enjab UI](/docs/changelog/enjab-ui), [Enjab Auth](/docs/changelog/enjab-auth), [Engineering Standards](/docs/changelog/standards))
+- **What changed**: the [Changelog](/docs/changelog) ([Enjab UI](/docs/changelog/enjab-ui), [Enjab Auth](/docs/changelog/enjab-auth), [Enjab RAG](/docs/changelog/enjab-rag), [Engineering Standards](/docs/changelog/standards))
 
 Hand these to your agent and they can bring your tool up to the current standard, applying
 only the delta.

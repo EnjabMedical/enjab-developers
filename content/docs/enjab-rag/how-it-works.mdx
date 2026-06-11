@@ -40,7 +40,7 @@ Chunks and their vectors are stored in Postgres with pgvector (`halfvec`, cosine
 | Input | How it is read |
 |---|---|
 | **PDF** | Text layer extracted; scanned / image-only PDFs fall back to model OCR. |
-| **Word** (`.docx`) | Text extracted (mammoth). |
+| **Word** (`.docx`) | Text extracted (mammoth). Legacy binary `.doc` is not supported, save as `.docx` or PDF. |
 | **Spreadsheet** (`.xlsx`, `.xls`, `.csv`) | Parsed per sheet into rows the model can read. |
 | **Image** (`png`, `jpg`, `webp`, …) | OCR'd with a vision model. |
 | **Audio** (`mp3`, `wav`, `m4a`, …) | Transcribed with Whisper. |

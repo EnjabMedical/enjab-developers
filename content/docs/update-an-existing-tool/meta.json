@@ -1,2 +1,2 @@
 { "title": "Update an existing tool", "icon": "RefreshCw",
-  "pages": ["index", "ui", "auth", "standards"] }
+  "pages": ["index", "ui", "auth", "rag", "standards"] }

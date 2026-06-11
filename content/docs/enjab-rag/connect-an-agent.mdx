@@ -49,7 +49,7 @@ claude mcp add --transport http enjab-rag https://rag.enjab.ae/api/mcp \
 The agent now has:
 
 - **`search`** — `{ query: string, limit?: number, collection?: string }`. Returns ranked passages with each one's source title, summary, and metadata. The agent calls this to ground answers about how the clinics operate.
-- **`fetch`** — `{ id: string }`. Returns one full document (extracted text, summary, tags, metadata) by id, useful after a `search` hit to read the whole source.
+- **`fetch`** — `{ id: string }`. Pass the `document_id` from a `search` result to read that whole source back (title, full extracted text, summary, tags, metadata).
 
 Tell the agent, in its system prompt, to **search Enjab RAG before answering operational questions** so it grounds on shared knowledge instead of guessing.
 </Step>
