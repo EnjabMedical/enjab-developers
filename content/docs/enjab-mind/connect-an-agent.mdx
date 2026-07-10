@@ -111,29 +111,45 @@ Reference: [Goose extensions docs](https://block.github.io/goose/docs/getting-st
 
 ## Claude apps
 
+<Callout type="warn" title="Enjab Mind uses an API key, not OAuth">
+Claude's **Add custom connector** dialog is built for OAuth. Its Advanced settings show **OAuth Client ID / OAuth Client Secret**, do **not** paste your Enjab Mind key there. Pasting a secret with no client ID produces the error *"A client id must be provided with a client secret."* Use one of the methods below instead.
+</Callout>
+
 <Tabs items={['Claude Desktop', 'Claude.ai (web)']}>
 <Tab value="Claude Desktop">
-**Settings → Connectors → Add custom connector.**
+Enjab Mind authenticates with a Bearer header, so connect it through the config file using the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) bridge (needs Node/npm). Edit:
 
-1. URL: `https://mind.enjab.ae/api/mcp`
-2. Open **Request headers**, add header name `Authorization`, value `Bearer enjabmind_YOUR_KEY` (type the word `Bearer` yourself, Claude sends the value verbatim).
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
-<Callout type="warn">
-Request-header auth is in **beta**. If you don't see a Request headers field, use the `mcp-remote` fallback in the last section of this page.
+```json title="claude_desktop_config.json"
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "command": "npx",
+      "args": [
+        "-y", "mcp-remote", "https://mind.enjab.ae/api/mcp",
+        "--header", "Authorization: Bearer enjabmind_YOUR_KEY"
+      ]
+    }
+  }
+}
+```
+
+Fully **quit and reopen** Claude Desktop after saving.
+
+<Callout type="info">
+Newer (beta) Claude Desktop builds add a **Request headers** field in the connector dialog. If yours has it, you can instead: **Settings → Connectors → Add custom connector**, URL `https://mind.enjab.ae/api/mcp`, and under Request headers set `Authorization` = `Bearer enjabmind_YOUR_KEY` (leave the OAuth fields blank). If you don't see that field, use the config file above.
 </Callout>
 
 Reference: [Custom connectors](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
 </Tab>
 
 <Tab value="Claude.ai (web)">
-**Settings → Connectors → Add custom connector** (Team/Enterprise: an admin adds it under **Admin settings → Connectors** first).
+The web app can't run the `mcp-remote` bridge, and the connector dialog defaults to OAuth. Two cases:
 
-1. Remote MCP server URL: `https://mind.enjab.ae/api/mcp`
-2. Under **Request headers**: name `authorization`, value `Bearer enjabmind_YOUR_KEY`. Leave the OAuth fields blank.
-
-<Callout type="warn">
-The request-headers option is in **beta** (allowlisted headers: `authorization`, `x-api-key`, `x-auth-token`).
-</Callout>
+- **If your account has the Request headers beta:** **Settings → Connectors → Add custom connector**, URL `https://mind.enjab.ae/api/mcp`, and under **Request headers** set `authorization` = `Bearer enjabmind_YOUR_KEY`. Leave OAuth Client ID / Secret **blank** (allowlisted headers: `authorization`, `x-api-key`, `x-auth-token`).
+- **If the dialog only shows OAuth Client ID / Secret:** Enjab Mind (API-key auth) can't be added from Claude web yet. Connect from **Claude Code**, **Claude Desktop** (config above), or any editor instead.
 
 Reference: [Remote MCP connectors](https://claude.com/docs/connectors/custom/remote-mcp#authenticating-with-request-headers).
 </Tab>
