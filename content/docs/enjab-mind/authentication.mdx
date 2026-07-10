@@ -1,0 +1,28 @@
+---
+title: Authentication
+description: Enjab Mind API keys, read vs write, and where to mint them.
+icon: KeyRound
+---
+
+Agents authenticate to the Enjab Mind MCP with an API key sent as a Bearer token:
+
+```http
+Authorization: Bearer enjabmind_YOUR_KEY
+```
+
+Some clients label this a "header"; some send it for you after you paste the key. Where a client can't send custom headers to a remote MCP, use the `mcp-remote` proxy (shown per client in [Connect an agent](/docs/enjab-mind/connect-an-agent)) with `--header "Authorization: Bearer enjabmind_YOUR_KEY"`.
+
+## Minting keys
+
+Staff sign in at [mind.enjab.ae/dash/keys](https://mind.enjab.ae/dash/keys) (Sign in with Enjab) and create a key per agent. The raw key is shown **once**, only its hash is stored, so copy it then. Lost a key? Revoke it and mint a new one.
+
+## Scopes
+
+| Scope | Can do | Use for |
+|---|---|---|
+| **Read only** | `search`, `list_lists`, `get_list` | Most agents (they recall saved things). |
+| **Read + write** | the above **plus** create / update / delete lists and entries | Agents that curate the knowledge base. |
+
+<Callout type="info">
+Give each agent its own named key, so usage is traceable and you can revoke one without disrupting the others. Default to read-only; grant write only where an agent should add or edit.
+</Callout>

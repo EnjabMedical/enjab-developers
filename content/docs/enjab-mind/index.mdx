@@ -1,0 +1,31 @@
+---
+title: Overview
+description: Enjab Mind is the shared knowledge base for Enjab, lists of tools, links, ideas, and anything worth remembering, with an MCP so agents can read and write it.
+icon: Brain
+---
+
+Enjab Mind is Enjab's shared, curated memory: **lists** of saved tools, links, GitHub repos, MCPs, people, ideas, agents, and anything else worth keeping. Everyone with access shares the same lists, and an **MCP server** lets your agents read and write them natively.
+
+- **Home:** [mind.enjab.ae](https://mind.enjab.ae)
+- **MCP endpoint:** `https://mind.enjab.ae/api/mcp`
+- **Transport:** Streamable HTTP · **Auth:** `Authorization: Bearer` API key
+
+<Callout type="info">
+Enjab Mind is a companion to [Enjab RAG](/docs/enjab-rag). RAG is the clinics' operational knowledge for grounding answers; Mind is the team's curated bookmarks and lists. Both connect over MCP.
+</Callout>
+
+## What agents can do
+
+Over the MCP, an agent can **read** (search everything, list the lists, read a list) on any key, and **write** (add/edit/remove lists and entries) on a read-write key. Adding an entry with a URL auto-fetches its title, description, and favicon.
+
+<Cards>
+  <Card title="Connect an agent" href="/docs/enjab-mind/connect-an-agent" description="Add the Enjab Mind MCP to Claude Code, Claude Desktop, Cursor, VS Code, Codex, and more, one tab per tool." />
+  <Card title="Tools" href="/docs/enjab-mind/tools" description="The MCP tools: search, list_lists, get_list, and the create/update/delete tools for lists and entries." />
+  <Card title="Authentication" href="/docs/enjab-mind/authentication" description="API keys, read vs write, and where to mint them." />
+</Cards>
+
+## The gist
+
+1. Mint a key at [mind.enjab.ae/dash/keys](https://mind.enjab.ae/dash/keys) (read-only is enough for most agents).
+2. Add the MCP server to your agent, pointing at `https://mind.enjab.ae/api/mcp` with the header `Authorization: Bearer <key>`. See [Connect an agent](/docs/enjab-mind/connect-an-agent) for the exact steps per tool.
+3. The agent now has the `search` / `list_lists` / `get_list` tools (and the write tools on a read-write key).

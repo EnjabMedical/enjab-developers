@@ -1,0 +1,287 @@
+---
+title: Connect an agent
+description: Add the Enjab Mind MCP to your agent, exact steps for Claude Code, Claude apps, Cursor, VS Code, Codex, Gemini CLI, and more.
+icon: Plug
+---
+
+Enjab Mind is a **remote Streamable-HTTP MCP server**. Point any MCP client at it with your API key as a Bearer header and it gets the [tools](/docs/enjab-mind/tools).
+
+- **URL:** `https://mind.enjab.ae/api/mcp`
+- **Transport:** HTTP (Streamable HTTP)
+- **Auth header:** `Authorization: Bearer enjabmind_YOUR_KEY`
+
+<Callout title="First, mint a key">
+Sign in at **[mind.enjab.ae/dash/keys](https://mind.enjab.ae/dash/keys)** and create an API key (read-only is enough for most agents). Copy it once, then drop it into the steps below. See [Authentication](/docs/enjab-mind/authentication).
+</Callout>
+
+<Callout type="info">
+Every client below supports remote HTTP MCP and a custom auth header **natively**. The field names differ per client (`url` vs `serverUrl` vs `httpUrl` vs `uri`; `http` vs `streamableHttp` vs `streamable_http`), so use the exact snippet for your tool. Replace `enjabmind_YOUR_KEY` with your key throughout.
+</Callout>
+
+## Command-line agents
+
+<Tabs items={['Claude Code', 'Codex', 'Gemini CLI', 'Goose']}>
+<Tab value="Claude Code">
+One command (`-s user` makes it available in every project):
+
+```bash
+claude mcp add --transport http --scope user enjab-mind https://mind.enjab.ae/api/mcp \
+  --header "Authorization: Bearer enjabmind_YOUR_KEY"
+```
+
+Or commit it to a project by creating `.mcp.json` at the repo root:
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "type": "http",
+      "url": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [Claude Code MCP docs](https://code.claude.com/docs/en/mcp).
+</Tab>
+
+<Tab value="Codex">
+Keep the key in an env var and add it with the CLI:
+
+```bash
+export ENJAB_MIND_TOKEN="enjabmind_YOUR_KEY"
+codex mcp add enjab-mind \
+  --url https://mind.enjab.ae/api/mcp \
+  --bearer-token-env-var ENJAB_MIND_TOKEN
+```
+
+Or edit `~/.codex/config.toml`:
+
+```toml title="~/.codex/config.toml"
+[mcp_servers.enjab-mind]
+url = "https://mind.enjab.ae/api/mcp"
+bearer_token_env_var = "ENJAB_MIND_TOKEN"
+# or hardcode: http_headers = { Authorization = "Bearer enjabmind_YOUR_KEY" }
+```
+
+Reference: [Codex config reference](https://developers.openai.com/codex/config-reference).
+</Tab>
+
+<Tab value="Gemini CLI">
+```bash
+gemini mcp add --scope user --transport http \
+  --header "Authorization: Bearer enjabmind_YOUR_KEY" \
+  enjab-mind https://mind.enjab.ae/api/mcp
+```
+
+Or edit `~/.gemini/settings.json` (note the `httpUrl` field):
+
+```json title="~/.gemini/settings.json"
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "httpUrl": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [Gemini CLI MCP docs](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md).
+</Tab>
+
+<Tab value="Goose">
+Run `goose configure` → **Add Extension** → **Remote Extension (Streamable HTTP)**, or edit `~/.config/goose/config.yaml`:
+
+```yaml title="~/.config/goose/config.yaml"
+extensions:
+  enjab_mind:
+    name: Enjab Mind
+    type: streamable_http
+    uri: https://mind.enjab.ae/api/mcp
+    headers:
+      Authorization: Bearer enjabmind_YOUR_KEY
+    enabled: true
+```
+
+Reference: [Goose extensions docs](https://block.github.io/goose/docs/getting-started/using-extensions/).
+</Tab>
+</Tabs>
+
+## Claude apps
+
+<Tabs items={['Claude Desktop', 'Claude.ai (web)']}>
+<Tab value="Claude Desktop">
+**Settings → Connectors → Add custom connector.**
+
+1. URL: `https://mind.enjab.ae/api/mcp`
+2. Open **Request headers**, add header name `Authorization`, value `Bearer enjabmind_YOUR_KEY` (type the word `Bearer` yourself, Claude sends the value verbatim).
+
+<Callout type="warn">
+Request-header auth is in **beta**. If you don't see a Request headers field, use the `mcp-remote` fallback in the last section of this page.
+</Callout>
+
+Reference: [Custom connectors](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp).
+</Tab>
+
+<Tab value="Claude.ai (web)">
+**Settings → Connectors → Add custom connector** (Team/Enterprise: an admin adds it under **Admin settings → Connectors** first).
+
+1. Remote MCP server URL: `https://mind.enjab.ae/api/mcp`
+2. Under **Request headers**: name `authorization`, value `Bearer enjabmind_YOUR_KEY`. Leave the OAuth fields blank.
+
+<Callout type="warn">
+The request-headers option is in **beta** (allowlisted headers: `authorization`, `x-api-key`, `x-auth-token`).
+</Callout>
+
+Reference: [Remote MCP connectors](https://claude.com/docs/connectors/custom/remote-mcp#authenticating-with-request-headers).
+</Tab>
+</Tabs>
+
+## Editors & IDEs
+
+<Tabs items={['Cursor', 'VS Code', 'Windsurf', 'Cline', 'Zed', 'Antigravity', 'JetBrains']}>
+<Tab value="Cursor">
+Edit `~/.cursor/mcp.json` (global) or `<project>/.cursor/mcp.json`:
+
+```json title="~/.cursor/mcp.json"
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "url": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [Cursor MCP docs](https://cursor.com/docs/mcp).
+</Tab>
+
+<Tab value="VS Code">
+Command Palette → **MCP: Add Server** → **HTTP**, or create `.vscode/mcp.json` (note the `servers` key and `type: "http"`):
+
+```json title=".vscode/mcp.json"
+{
+  "servers": {
+    "enjab-mind": {
+      "type": "http",
+      "url": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [VS Code MCP configuration](https://code.visualstudio.com/docs/agents/reference/mcp-configuration).
+</Tab>
+
+<Tab value="Windsurf">
+Cascade panel → MCP icon, or edit `~/.codeium/windsurf/mcp_config.json` (note `serverUrl`):
+
+```json title="~/.codeium/windsurf/mcp_config.json"
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "serverUrl": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [Cascade MCP docs](https://docs.devin.ai/desktop/cascade/mcp).
+</Tab>
+
+<Tab value="Cline">
+Cline panel → MCP Servers → Remote Servers, or edit `cline_mcp_settings.json` (note `type: "streamableHttp"`):
+
+```json title="cline_mcp_settings.json"
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "type": "streamableHttp",
+      "url": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [Cline MCP overview](https://docs.cline.bot/mcp/mcp-overview).
+</Tab>
+
+<Tab value="Zed">
+Settings → AI → MCP Servers → **Add Remote Server**, or edit `~/.config/zed/settings.json` (note `context_servers`):
+
+```json title="~/.config/zed/settings.json"
+{
+  "context_servers": {
+    "enjab-mind": {
+      "url": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [Zed MCP docs](https://zed.dev/docs/ai/mcp).
+</Tab>
+
+<Tab value="Antigravity">
+Agent panel → **…** → MCP Servers → Manage → View raw config, or edit `mcp_config.json` (note `serverUrl`):
+
+```json title="~/.gemini/config/mcp_config.json"
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "serverUrl": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [Antigravity MCP install guide](https://github.com/github/github-mcp-server/blob/main/docs/installation-guides/install-antigravity.md).
+</Tab>
+
+<Tab value="JetBrains">
+For **Junie**, add to `.junie/mcp/mcp.json` (project) or `~/.junie/mcp/mcp.json` (user):
+
+```json title=".junie/mcp/mcp.json"
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "url": "https://mind.enjab.ae/api/mcp",
+      "headers": { "Authorization": "Bearer enjabmind_YOUR_KEY" }
+    }
+  }
+}
+```
+
+Reference: [Junie MCP configuration](https://junie.jetbrains.com/docs/junie-cli-mcp-configuration.html).
+</Tab>
+</Tabs>
+
+## Any other client (mcp-remote fallback)
+
+If a client only speaks local **stdio** MCP, or can't send a custom header, bridge to Enjab Mind with the community [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) proxy. Add this wherever that client takes a command-based server:
+
+```json
+{
+  "mcpServers": {
+    "enjab-mind": {
+      "command": "npx",
+      "args": [
+        "-y", "mcp-remote", "https://mind.enjab.ae/api/mcp",
+        "--header", "Authorization: Bearer enjabmind_YOUR_KEY"
+      ]
+    }
+  }
+}
+```
+
+## Use it
+
+Once connected, the agent has `search`, `list_lists`, and `get_list` (and the write tools on a read-write key). Tell it, in its system prompt, to **search Enjab Mind when it needs a saved tool, link, or reference**. See the full [tool list](/docs/enjab-mind/tools).

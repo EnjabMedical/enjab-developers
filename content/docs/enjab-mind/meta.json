@@ -1,0 +1,5 @@
+{
+  "title": "Enjab Mind",
+  "icon": "Brain",
+  "pages": ["index", "connect-an-agent", "tools", "authentication"]
+}

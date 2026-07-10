@@ -1,0 +1,32 @@
+---
+title: Tools
+description: The Enjab Mind MCP tools, read on any key, write on a read-write key.
+icon: Wrench
+---
+
+Once [connected](/docs/enjab-mind/connect-an-agent), an agent has these tools. **Read** tools work on any key; **write** tools need a read-write key (see [Authentication](/docs/enjab-mind/authentication)). A `list` argument accepts either the list's slug (e.g. `tools`) or its id.
+
+## Read
+
+| Tool | Arguments | Returns |
+|---|---|---|
+| `search` | `query` (string, optional), `limit` (number, default 30) | Matching entries across every list, ranked. Empty query returns the most recent. |
+| `list_lists` | — | Every list with its entry count. |
+| `get_list` | `list` (slug or id) | All entries in that list. |
+
+## Write (read-write key)
+
+| Tool | Arguments |
+|---|---|
+| `create_list` | `name` (string), `description?`, `icon?` (a Lucide icon name) |
+| `update_list` | `list` (slug or id), `name?`, `description?`, `icon?` |
+| `delete_list` | `list` (slug or id) — deletes the list and its entries |
+| `create_entry` | `list` (slug or id), `title?`, `url?`, `note?`, `tags?` (string[]), `metadata?` (object) |
+| `update_entry` | `id`, `title?`, `url?`, `note?`, `tags?`, `metadata?`, `pinned?` |
+| `delete_entry` | `id` |
+
+<Callout type="info">
+**Auto-enrich:** on `create_entry`, if you pass a `url`, Enjab Mind fetches the page and fills in the title, description, and favicon for any field you left out. So `create_entry({ list: "tools", url: "https://…" })` is enough.
+</Callout>
+
+Entries share a uniform core (`title`, `url`, `note`, `tags`) plus a flexible `metadata` object for per-list extras (e.g. `stars`/`language` for a GitHub entry, `platform`/`handle` for an influencer). `metadata` is searchable.
