@@ -79,6 +79,8 @@ The Enjab logo (@enjab-ui/logo) appears in exactly one place: the "an Enjab prod
 
 Every route that fetches data must ship a loading.tsx skeleton that mirrors the real page. Navigation must feel instant even while data loads. Never show a blank or frozen screen.
 
+The skeleton must be an **accurate representation of that specific screen, not a generic placeholder**. Mirror the real page's actual structure: the same header (with or without its action), the same layout kind (a card grid for a card grid, this table's columns for a table, this form's fields for a form), and roughly the same element counts, sizes, and positions. Never reuse one generic skeleton across differently-shaped pages, and never fall back to a lone spinner for page navigation. Someone should recognize which page a skeleton is by looking at it. The snippet below is only a shape example, adapt it to your page.
+
 ```tsx title="app/dashboard/loading.tsx"
 export default function DashboardLoading() {
   return (

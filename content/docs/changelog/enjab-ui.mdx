@@ -8,6 +8,14 @@ Changes to the [Enjab UI](/docs/enjab-ui) design system, newest first. To bring 
 to date, see [Update an existing tool](/docs/update-an-existing-tool/ui) or use the
 combined update prompt on the [Changelog overview](/docs/changelog).
 
+## 2026.07.10a: Skeletons must be accurate, not generic
+
+`Enjab UI` · 10 Jul 2026
+
+**Changed.** Strengthened the loading rule: a `loading.tsx` skeleton (and any loader) must be an **accurate representation of that specific screen, not a generic placeholder**. Mirror the real page's actual structure, the same header (with or without its action), the same layout kind (a card grid for a card grid, this table's columns for a table, this form's fields for a form), and roughly the same element counts, sizes, and positions. Never reuse one generic skeleton across differently-shaped pages, and never fall back to a lone spinner or a vague pulsing block for page navigation. Someone should recognize which page a skeleton belongs to just by looking at it. See [Foundations](/docs/enjab-ui/foundations) and [Dashboard chrome](/docs/enjab-ui/dashboard-chrome).
+
+**Apply.** Audit each route's `loading.tsx`: does it match that page's real shape (header + action, grid vs table vs form, element counts)? Replace any reused or generic skeleton with a page-specific one.
+
 ## 2026.06.08a: Tables are sortable by default
 
 `Enjab UI` · 8 Jun 2026

@@ -111,6 +111,8 @@ The Enjab parent logo appears in exactly one place: the "an Enjab product" bylin
 
 Navigation must be instant. Every data-fetching route ships a Next.js `loading.tsx` skeleton that mirrors the page and shows immediately while data loads. Never a blank or frozen screen. Skeletons use `animate-pulse` on `bg-muted`, sized to match the real content with no layout shift.
 
+**Skeletons and loaders must be an accurate representation of that specific screen, not a generic placeholder.** A skeleton is a low-fidelity portrait of the exact page it replaces: the same header (with or without its action), the same layout kind (a card grid for a card grid, this table's columns for a table, this form's fields for a form), and roughly the same element counts, sizes, and positions. Never reuse one generic skeleton across differently-shaped pages, and never fall back to a lone spinner or a vague pulsing block for page navigation. Someone should recognize which page a skeleton belongs to just by looking at it.
+
 ## App Shell & Layout
 
 Build the dashboard chrome from ready components, never hand-roll the sidebar, topbar, or table:
